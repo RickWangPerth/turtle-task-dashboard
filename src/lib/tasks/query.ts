@@ -1,0 +1,91 @@
+import {
+  TASK_ENVIRONMENTS,
+  TASK_PRIORITIES,
+  TASK_STATUSES,
+} from "@/lib/tasks/constants";
+import type { Database } from "@/lib/supabase/types";
+
+export type Task = Database["public"]["Tables"]["tasks"]["Row"];
+export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
+
+export type TaskFilterParams = {
+  environment?: string;
+  epic?: string;
+  owner?: string;
+  priority?: string;
+  q?: string;
+  status?: string;
+};
+
+export function paramsFromSearchParams(
+  searchParams: URLSearchParams,
+): TaskFilterParams {
+  return {
+    environment: searchParams.get("environment") ?? undefined,
+    epic: searchParams.get("epic") ?? undefined,
+    owner: searchParams.get("owner") ?? undefined,
+    priority: searchParams.get("priority") ?? undefined,
+    q: searchParams.get("q") ?? undefined,
+    status: searchParams.get("status") ?? undefined,
+  };
+}
+
+export function applyTaskFilters<
+  T extends {
+    eq: (column: string, value: string) => T;
+    or: (filters: string) => T;
+  },
+>(query: T, params: TaskFilterParams) {
+  let nextQuery = query;
+
+  if (params.status && TASK_STATUSES.includes(params.status as never)) {
+    nextQuery = nextQuery.eq("status", params.status);
+  }
+
+  if (params.priority && TASK_PRIORITIES.includes(params.priority as never)) {
+    nextQuery = nextQuery.eq("priority", params.priority);
+  }
+
+  if (params.epic) {
+    nextQuery = nextQuery.eq("epic", params.epic);
+  }
+
+  if (params.owner) {
+    nextQuery = nextQuery.eq("owner_id", params.owner);
+  }
+
+  if (
+    params.environment &&
+    TASK_ENVIRONMENTS.includes(params.environment as never)
+  ) {
+    nextQuery = nextQuery.eq("environment", params.environment);
+  }
+
+  if (params.q) {
+    const term = params.q.replaceAll(",", " ").trim();
+    if (term) {
+      nextQuery = nextQuery.or(
+        `task_code.ilike.%${term}%,title.ilike.%${term}%,details.ilike.%${term}%`,
+      );
+    }
+  }
+
+  return nextQuery;
+}
+
+export function buildExportHref(
+  pathname: "/api/exports/tasks.csv" | "/api/exports/tasks.json",
+  params: TaskFilterParams,
+) {
+  const searchParams = new URLSearchParams();
+
+  for (const [key, value] of Object.entries(params)) {
+    if (value) {
+      searchParams.set(key, value);
+    }
+  }
+
+  const query = searchParams.toString();
+  return query ? `${pathname}?${query}` : pathname;
+}
+
