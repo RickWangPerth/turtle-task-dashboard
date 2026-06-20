@@ -7,9 +7,11 @@ import { createClient } from "@/lib/supabase/server";
 import {
   TASK_ENVIRONMENTS,
   TASK_PRIORITIES,
+  TASK_REVIEW_STATUSES,
   TASK_STATUSES,
   type TaskEnvironment,
   type TaskPriority,
+  type TaskReviewStatus,
   type TaskStatus,
 } from "@/lib/tasks/constants";
 import { emptyToNull } from "@/lib/tasks/format";
@@ -204,4 +206,35 @@ export async function updateTaskStatus(taskId: string, formData: FormData) {
   revalidatePath("/reports");
   revalidatePath(`/tasks/${taskId}`);
   redirectBackWithSaved("status");
+}
+
+export async function updateTaskReviewStatus(
+  taskId: string,
+  formData: FormData,
+) {
+  const reviewStatus = requireOption(
+    formData.get("review_status"),
+    TASK_REVIEW_STATUSES,
+    "Needs Review",
+  ) as TaskReviewStatus;
+
+  const supabase = createClient();
+  const taskTable = supabase.from("tasks") as unknown as {
+    update: (
+      payload: TaskUpdate,
+    ) => ReturnType<ReturnType<typeof supabase.from>["update"]>;
+  };
+
+  const { error } = await taskTable
+    .update({ review_status: reviewStatus })
+    .eq("id", taskId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  revalidatePath("/backlog");
+  revalidatePath("/reports");
+  revalidatePath(`/tasks/${taskId}`);
+  redirectBackWithSaved("review");
 }

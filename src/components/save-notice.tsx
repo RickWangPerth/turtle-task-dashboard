@@ -4,6 +4,7 @@ const messages: Record<string, string> = {
   created: "Task created.",
   iteration: "Iteration saved.",
   profile: "User profile saved.",
+  review: "Review status updated.",
   status: "Status updated.",
   task: "Task saved.",
   task_setup: "Task setup saved.",

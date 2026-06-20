@@ -3,11 +3,16 @@ import { redirect } from "next/navigation";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
 import { SaveNotice } from "@/components/save-notice";
-import { PriorityBadge, StatusBadge } from "@/components/badges";
+import {
+  PriorityBadge,
+  ReviewStatusBadge,
+  StatusBadge,
+} from "@/components/badges";
 import { createClient } from "@/lib/supabase/server";
 import {
   TASK_ENVIRONMENTS,
   TASK_PRIORITIES,
+  TASK_REVIEW_STATUSES,
   TASK_STATUSES,
 } from "@/lib/tasks/constants";
 import { formatDate, formatDateTime } from "@/lib/tasks/format";
@@ -18,6 +23,7 @@ import {
   type Sprint,
   type Task,
 } from "@/lib/tasks/query";
+import { updateTaskReviewStatus } from "../tasks/actions";
 
 type BacklogPageProps = {
   searchParams?: {
@@ -26,6 +32,7 @@ type BacklogPageProps = {
     epic?: string;
     priority?: string;
     q?: string;
+    review_status?: string;
     saved?: string;
     sprint?: string;
     status?: string;
@@ -58,6 +65,7 @@ export default async function BacklogPage({ searchParams }: BacklogPageProps) {
     { data: tasks, error: tasksError },
     { data: profiles },
     { data: sprints },
+    { data: currentProfile },
   ] = await Promise.all([
     query,
     supabase
@@ -68,6 +76,7 @@ export default async function BacklogPage({ searchParams }: BacklogPageProps) {
       ascending: false,
       nullsFirst: false,
     }),
+    supabase.from("profiles").select("role").eq("id", user.id).maybeSingle(),
   ]);
 
   if (tasksError) {
@@ -79,6 +88,10 @@ export default async function BacklogPage({ searchParams }: BacklogPageProps) {
   const sprintRows = (sprints ?? []) as Sprint[];
   const profileById = new Map(profileRows.map((item) => [item.id, item]));
   const sprintById = new Map(sprintRows.map((item) => [item.id, item]));
+  const currentUserProfile = currentProfile as Pick<Profile, "role"> | null;
+  const canUpdateReview =
+    currentUserProfile?.role === "admin" ||
+    currentUserProfile?.role === "developer";
   const epics = Array.from(
     new Set(
       taskRows
@@ -118,7 +131,7 @@ export default async function BacklogPage({ searchParams }: BacklogPageProps) {
       <SaveNotice saved={params.saved} />
 
       <form className="rounded-lg border border-border bg-white p-4 shadow-sm">
-        <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-7">
+        <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-8">
           <label className="block">
             <span className="text-xs font-medium uppercase tracking-wide text-muted">
               Search
@@ -160,6 +173,23 @@ export default async function BacklogPage({ searchParams }: BacklogPageProps) {
               {TASK_PRIORITIES.map((priority) => (
                 <option key={priority} value={priority}>
                   {priority}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="block">
+            <span className="text-xs font-medium uppercase tracking-wide text-muted">
+              Review
+            </span>
+            <select
+              className="mt-2 w-full rounded-md border border-border px-3 py-2 text-sm"
+              name="review_status"
+              defaultValue={params.review_status ?? ""}
+            >
+              <option value="">All</option>
+              {TASK_REVIEW_STATUSES.map((status) => (
+                <option key={status} value={status}>
+                  {status}
                 </option>
               ))}
             </select>
@@ -260,6 +290,7 @@ export default async function BacklogPage({ searchParams }: BacklogPageProps) {
                   <th className="px-4 py-3">Epic</th>
                   <th className="px-4 py-3">Priority</th>
                   <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">Review</th>
                   <th className="px-4 py-3">Requester</th>
                   <th className="px-4 py-3">Assignee</th>
                   <th className="px-4 py-3">Sprint</th>
@@ -271,9 +302,16 @@ export default async function BacklogPage({ searchParams }: BacklogPageProps) {
               <tbody className="divide-y divide-border">
                 {taskRows.map((task) => {
                   const isDone = task.status === "Done";
+                  const needsReview = task.review_status === "Needs Review";
                   return (
                     <tr
-                      className={isDone ? "bg-slate-50 text-muted" : "hover:bg-slate-50"}
+                      className={
+                        isDone
+                          ? "bg-slate-50 text-muted"
+                          : needsReview
+                            ? "bg-amber-50/70 hover:bg-amber-50"
+                            : "hover:bg-slate-50"
+                      }
                       key={task.id}
                     >
                       <td className="whitespace-nowrap px-4 py-3 font-medium text-ink">
@@ -301,6 +339,34 @@ export default async function BacklogPage({ searchParams }: BacklogPageProps) {
                       </td>
                       <td className="px-4 py-3">
                         <StatusBadge status={task.status} />
+                      </td>
+                      <td className="min-w-48 px-4 py-3">
+                        {canUpdateReview ? (
+                          <form
+                            action={updateTaskReviewStatus.bind(null, task.id)}
+                            className="flex items-center gap-2"
+                          >
+                            <select
+                              className="rounded-md border border-border bg-white px-2 py-1.5 text-xs text-ink"
+                              defaultValue={task.review_status}
+                              name="review_status"
+                            >
+                              {TASK_REVIEW_STATUSES.map((status) => (
+                                <option key={status} value={status}>
+                                  {status}
+                                </option>
+                              ))}
+                            </select>
+                            <button
+                              className="rounded-md bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-slate-700"
+                              type="submit"
+                            >
+                              Save
+                            </button>
+                          </form>
+                        ) : (
+                          <ReviewStatusBadge status={task.review_status} />
+                        )}
                       </td>
                       <td className="px-4 py-3 text-muted">
                         {task.requester ?? "-"}

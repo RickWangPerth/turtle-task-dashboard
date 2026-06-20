@@ -45,6 +45,12 @@ export type Database = {
             | "Review/UAT"
             | "Blocked"
             | "Done";
+          review_status:
+            | "Needs Review"
+            | "Reviewed"
+            | "Needs More Info"
+            | "Rejected"
+            | "Duplicate";
           requester: string | null;
           owner_id: string | null;
           assignee_id: string | null;
@@ -79,6 +85,12 @@ export type Database = {
             | "Review/UAT"
             | "Blocked"
             | "Done";
+          review_status?:
+            | "Needs Review"
+            | "Reviewed"
+            | "Needs More Info"
+            | "Rejected"
+            | "Duplicate";
           requester?: string | null;
           owner_id?: string | null;
           assignee_id?: string | null;
@@ -111,6 +123,12 @@ export type Database = {
             | "Review/UAT"
             | "Blocked"
             | "Done";
+          review_status?:
+            | "Needs Review"
+            | "Reviewed"
+            | "Needs More Info"
+            | "Rejected"
+            | "Duplicate";
           requester?: string | null;
           owner_id?: string | null;
           assignee_id?: string | null;

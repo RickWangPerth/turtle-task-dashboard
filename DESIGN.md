@@ -22,6 +22,14 @@ Current statuses:
 * Blocked
 * Done
 
+Review statuses for imported or newly triaged tasks:
+
+* Needs Review
+* Reviewed
+* Needs More Info
+* Rejected
+* Duplicate
+
 Iteration behavior:
 
 * If an Active iteration exists, Board shows that iteration by default.
@@ -36,6 +44,8 @@ Admin behavior:
 * Admin does not manage passwords.
 * Public signup is not exposed.
 * Notifications are deferred until the workflow has been tested with real work.
+* Bulk import is one-time only and inserts directly into `public.tasks`.
+* Do not add import batch tables.
 
 ## Product Name
 

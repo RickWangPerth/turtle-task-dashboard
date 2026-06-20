@@ -20,6 +20,16 @@ Current delivery statuses:
 5. Blocked
 6. Done
 
+Task review statuses:
+
+* Needs Review
+* Reviewed
+* Needs More Info
+* Rejected
+* Duplicate
+
+Bulk import is one-time only. Imported wishlist tasks should be inserted directly into `public.tasks` with `status = 'Backlog'` and `review_status = 'Needs Review'`. Do not add `task_import_batches` or import batch tables.
+
 Sprint/iteration support is intentionally lightweight. Board uses an Active iteration when one exists. If no Active iteration exists, Board falls back to all non-Done tasks, including Backlog.
 
 Admin UI is minimal and should stay simple:

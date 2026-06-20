@@ -572,6 +572,34 @@ Tasks:
 - [x] Show success notice after Admin user, iteration, and task setup updates.
 - [x] Browser-verify notice rendering.
 
+### Issue 42: Add minimal task review tracking
+
+Status: Done
+
+Tasks:
+
+- [x] Add `tasks.review_status`.
+- [x] Add allowed review values: Needs Review, Reviewed, Needs More Info, Rejected, Duplicate.
+- [x] Add Backlog review status filter.
+- [x] Show review status badge in Backlog.
+- [x] Highlight Needs Review tasks.
+- [x] Allow admin/developer to update review status from Backlog.
+- [x] Do not add import batch tables.
+
+### Issue 43: Add one-time wishlist import SQL
+
+Status: Done
+
+Tasks:
+
+- [x] Add `supabase/imports/initial_wishlist_tasks.sql`.
+- [x] Insert directly into `public.tasks`.
+- [x] Use `status = Backlog`.
+- [x] Use `review_status = Needs Review`.
+- [x] Use `priority = P3` unless urgent.
+- [x] Use `environment = NA`.
+- [x] Use `requester = Turtle Team` where requester is not known.
+
 ## Architecture Decisions
 
 ### ADR-001: Database trigger owns status history
@@ -629,3 +657,7 @@ Notifications are not part of this phase. They should not be implemented until i
 ### ADR-014: Use Page-Level Save Notices
 
 Save and update actions redirect back to the relevant page with a `saved` query parameter. Pages show a clear success notice near the top instead of using blocking modals or adding a toast library. This keeps feedback visible while avoiding extra client-side state.
+
+### ADR-015: One-Time Import Uses Task Review Status
+
+Initial wishlist import is a one-time SQL script that inserts directly into `public.tasks`. Imported tasks are marked with `review_status = 'Needs Review'`. No import batch table, dependency model, voting system, notification workflow, upload flow, or automatic AI classification is added.

@@ -28,3 +28,5 @@ npm run dev
 - After Phase 6-9, stop feature development and validate Iteration 1 with real work for at least one week before adding more features.
 - `/admin` is available only to internal `admin` users. It manages existing profiles, iterations, and task setup through server actions and RLS-compatible Supabase operations.
 - Notifications are intentionally deferred until real workflow usage has been tested.
+- Imported wishlist tasks use `tasks.review_status` so Rick/Liz can triage them in Backlog.
+- One-time import SQL lives at `supabase/imports/initial_wishlist_tasks.sql`; it inserts directly into `public.tasks` and does not use import batch tables.

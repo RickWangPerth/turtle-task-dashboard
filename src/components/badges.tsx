@@ -1,4 +1,8 @@
-import type { TaskPriority, TaskStatus } from "@/lib/tasks/constants";
+import type {
+  TaskPriority,
+  TaskReviewStatus,
+  TaskStatus,
+} from "@/lib/tasks/constants";
 
 const priorityStyles: Record<TaskPriority, string> = {
   P1: "border-red-200 bg-red-50 text-red-700",
@@ -13,6 +17,14 @@ const statusStyles: Record<TaskStatus, string> = {
   "Review/UAT": "border-violet-200 bg-violet-50 text-violet-800",
   Blocked: "border-orange-200 bg-orange-50 text-orange-800",
   Done: "border-emerald-200 bg-emerald-50 text-emerald-800",
+};
+
+const reviewStyles: Record<TaskReviewStatus, string> = {
+  "Needs Review": "border-amber-200 bg-amber-50 text-amber-800",
+  Reviewed: "border-emerald-200 bg-emerald-50 text-emerald-800",
+  "Needs More Info": "border-orange-200 bg-orange-50 text-orange-800",
+  Rejected: "border-red-200 bg-red-50 text-red-700",
+  Duplicate: "border-slate-200 bg-slate-50 text-slate-700",
 };
 
 type BadgeProps = {
@@ -36,4 +48,12 @@ export function PriorityBadge({ priority }: { priority: TaskPriority }) {
 
 export function StatusBadge({ status }: { status: TaskStatus }) {
   return <Badge className={statusStyles[status]}>{status}</Badge>;
+}
+
+export function ReviewStatusBadge({
+  status,
+}: {
+  status: TaskReviewStatus;
+}) {
+  return <Badge className={reviewStyles[status]}>{status}</Badge>;
 }

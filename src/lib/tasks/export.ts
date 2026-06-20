@@ -6,6 +6,7 @@ const EXPORT_FIELDS: Array<keyof Task> = [
   "epic",
   "priority",
   "status",
+  "review_status",
   "requester",
   "owner_id",
   "assignee_id",

@@ -21,6 +21,14 @@ export const TASK_ENVIRONMENTS = ["NA", "Local", "UAT", "PROD"] as const;
 
 export const SPRINT_STATUSES = ["Planning", "Active", "Completed"] as const;
 
+export const TASK_REVIEW_STATUSES = [
+  "Needs Review",
+  "Reviewed",
+  "Needs More Info",
+  "Rejected",
+  "Duplicate",
+] as const;
+
 export const TASK_EPICS = [
   "Data Entry Interface",
   "Data Entry Validation",
@@ -40,3 +48,4 @@ export type BoardStatus = (typeof BOARD_STATUSES)[number];
 export type TaskPriority = (typeof TASK_PRIORITIES)[number];
 export type TaskEnvironment = (typeof TASK_ENVIRONMENTS)[number];
 export type SprintStatus = (typeof SPRINT_STATUSES)[number];
+export type TaskReviewStatus = (typeof TASK_REVIEW_STATUSES)[number];

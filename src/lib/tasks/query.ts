@@ -1,6 +1,7 @@
 import {
   TASK_ENVIRONMENTS,
   TASK_PRIORITIES,
+  TASK_REVIEW_STATUSES,
   TASK_STATUSES,
 } from "@/lib/tasks/constants";
 import type { Database } from "@/lib/supabase/types";
@@ -16,6 +17,7 @@ export type TaskFilterParams = {
   owner?: string;
   priority?: string;
   q?: string;
+  review_status?: string;
   sprint?: string;
   status?: string;
 };
@@ -30,6 +32,7 @@ export function paramsFromSearchParams(
     owner: searchParams.get("owner") ?? undefined,
     priority: searchParams.get("priority") ?? undefined,
     q: searchParams.get("q") ?? undefined,
+    review_status: searchParams.get("review_status") ?? undefined,
     sprint: searchParams.get("sprint") ?? undefined,
     status: searchParams.get("status") ?? undefined,
   };
@@ -49,6 +52,13 @@ export function applyTaskFilters<
 
   if (params.priority && TASK_PRIORITIES.includes(params.priority as never)) {
     nextQuery = nextQuery.eq("priority", params.priority);
+  }
+
+  if (
+    params.review_status &&
+    TASK_REVIEW_STATUSES.includes(params.review_status as never)
+  ) {
+    nextQuery = nextQuery.eq("review_status", params.review_status);
   }
 
   if (params.epic) {
