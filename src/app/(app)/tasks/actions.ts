@@ -46,10 +46,12 @@ function getTaskPayload(formData: FormData) {
     status: requireOption(
       formData.get("status"),
       TASK_STATUSES,
-      "To Do",
+      "Backlog",
     ) as TaskStatus,
     requester: emptyToNull(formData.get("requester")),
     owner_id: emptyToNull(formData.get("owner_id")),
+    assignee_id: emptyToNull(formData.get("assignee_id")),
+    sprint_id: emptyToNull(formData.get("sprint_id")),
     details: emptyToNull(formData.get("details")),
     decision_needed: emptyToNull(formData.get("decision_needed")),
     acceptance_criteria: emptyToNull(formData.get("acceptance_criteria")),
@@ -86,7 +88,9 @@ export async function createTask(formData: FormData) {
   };
 
   const taskTable = supabase.from("tasks") as unknown as {
-    insert: (payload: TaskInsert) => ReturnType<ReturnType<typeof supabase.from>["insert"]>;
+    insert: (
+      payload: TaskInsert,
+    ) => ReturnType<ReturnType<typeof supabase.from>["insert"]>;
   };
 
   const { data, error } = await taskTable
@@ -98,8 +102,9 @@ export async function createTask(formData: FormData) {
     throw new Error(error.message);
   }
 
-  revalidatePath("/dashboard");
-  revalidatePath("/tasks");
+  revalidatePath("/backlog");
+  revalidatePath("/board");
+  revalidatePath("/reports");
   redirect(`/tasks/${data.id}`);
 }
 
@@ -108,7 +113,9 @@ export async function updateTask(taskId: string, formData: FormData) {
   const payload = getTaskPayload(formData);
 
   const taskTable = supabase.from("tasks") as unknown as {
-    update: (payload: TaskUpdate) => ReturnType<ReturnType<typeof supabase.from>["update"]>;
+    update: (
+      payload: TaskUpdate,
+    ) => ReturnType<ReturnType<typeof supabase.from>["update"]>;
   };
 
   const { error } = await taskTable
@@ -119,8 +126,9 @@ export async function updateTask(taskId: string, formData: FormData) {
     throw new Error(error.message);
   }
 
-  revalidatePath("/dashboard");
-  revalidatePath("/tasks");
+  revalidatePath("/backlog");
+  revalidatePath("/board");
+  revalidatePath("/reports");
   revalidatePath(`/tasks/${taskId}`);
   redirect(`/tasks/${taskId}`);
 }
@@ -166,12 +174,14 @@ export async function updateTaskStatus(taskId: string, formData: FormData) {
   const status = requireOption(
     formData.get("status"),
     TASK_STATUSES,
-    "To Do",
+    "Backlog",
   ) as TaskStatus;
 
   const supabase = createClient();
   const taskTable = supabase.from("tasks") as unknown as {
-    update: (payload: TaskUpdate) => ReturnType<ReturnType<typeof supabase.from>["update"]>;
+    update: (
+      payload: TaskUpdate,
+    ) => ReturnType<ReturnType<typeof supabase.from>["update"]>;
   };
 
   const { error } = await taskTable.update({ status }).eq("id", taskId);
@@ -180,7 +190,8 @@ export async function updateTaskStatus(taskId: string, formData: FormData) {
     throw new Error(error.message);
   }
 
-  revalidatePath("/dashboard");
-  revalidatePath("/tasks");
+  revalidatePath("/backlog");
+  revalidatePath("/board");
+  revalidatePath("/reports");
   revalidatePath(`/tasks/${taskId}`);
 }

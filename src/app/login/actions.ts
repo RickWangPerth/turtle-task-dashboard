@@ -50,5 +50,5 @@ export async function signInWithPassword(formData: FormData) {
     loginError(error.message);
   }
 
-  redirect("/dashboard");
+  redirect("/backlog");
 }

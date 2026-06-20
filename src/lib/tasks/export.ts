@@ -8,6 +8,8 @@ const EXPORT_FIELDS: Array<keyof Task> = [
   "status",
   "requester",
   "owner_id",
+  "assignee_id",
+  "sprint_id",
   "details",
   "decision_needed",
   "acceptance_criteria",
@@ -39,4 +41,3 @@ export function tasksToCsv(tasks: Task[]) {
 
   return [header, ...rows].join("\n");
 }
-

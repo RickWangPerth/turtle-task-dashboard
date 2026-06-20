@@ -5,13 +5,20 @@ import { createTask } from "../actions";
 
 export default async function NewTaskPage() {
   const supabase = createClient();
-  const { data: profiles, error } = await supabase
-    .from("profiles")
-    .select("*")
-    .order("display_name", { ascending: true });
+  const [{ data: profiles, error }, { data: sprints, error: sprintsError }] =
+    await Promise.all([
+      supabase
+        .from("profiles")
+        .select("*")
+        .order("display_name", { ascending: true }),
+      supabase
+        .from("sprints")
+        .select("*")
+        .order("start_date", { ascending: false }),
+    ]);
 
-  if (error) {
-    throw new Error(error.message);
+  if (error || sprintsError) {
+    throw new Error(error?.message ?? sprintsError?.message);
   }
 
   return (
@@ -23,6 +30,7 @@ export default async function NewTaskPage() {
       <TaskForm
         action={createTask}
         profiles={profiles ?? []}
+        sprints={sprints ?? []}
         submitLabel="Create task"
       />
     </div>

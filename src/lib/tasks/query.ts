@@ -7,13 +7,16 @@ import type { Database } from "@/lib/supabase/types";
 
 export type Task = Database["public"]["Tables"]["tasks"]["Row"];
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
+export type Sprint = Database["public"]["Tables"]["sprints"]["Row"];
 
 export type TaskFilterParams = {
+  assignee?: string;
   environment?: string;
   epic?: string;
   owner?: string;
   priority?: string;
   q?: string;
+  sprint?: string;
   status?: string;
 };
 
@@ -21,11 +24,13 @@ export function paramsFromSearchParams(
   searchParams: URLSearchParams,
 ): TaskFilterParams {
   return {
+    assignee: searchParams.get("assignee") ?? undefined,
     environment: searchParams.get("environment") ?? undefined,
     epic: searchParams.get("epic") ?? undefined,
     owner: searchParams.get("owner") ?? undefined,
     priority: searchParams.get("priority") ?? undefined,
     q: searchParams.get("q") ?? undefined,
+    sprint: searchParams.get("sprint") ?? undefined,
     status: searchParams.get("status") ?? undefined,
   };
 }
@@ -52,6 +57,14 @@ export function applyTaskFilters<
 
   if (params.owner) {
     nextQuery = nextQuery.eq("owner_id", params.owner);
+  }
+
+  if (params.assignee) {
+    nextQuery = nextQuery.eq("assignee_id", params.assignee);
+  }
+
+  if (params.sprint) {
+    nextQuery = nextQuery.eq("sprint_id", params.sprint);
   }
 
   if (
@@ -88,4 +101,3 @@ export function buildExportHref(
   const query = searchParams.toString();
   return query ? `${pathname}?${query}` : pathname;
 }
-

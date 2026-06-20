@@ -309,6 +309,244 @@ Notes:
 - Reports and exports are generated from `tasks`; no report tables were added.
 - CSV export supports `inline=1` only for browser verification; normal export links still return CSV attachment responses.
 
+## Next Stage: Turtle Team Delivery Board
+
+### Issue 23: Approve revised Delivery Board direction
+
+Status: Done
+
+Tasks:
+
+- [x] Document move from Wishlist Tracker to Turtle Team Delivery Board.
+- [x] Document real team workflow for Ellie/Jade, Rick, Liz, Sab, and Scott.
+- [x] Document revised navigation: Backlog, Board, Reports.
+- [x] Document removal of standalone Dashboard.
+- [x] Document invitation/admin-created login direction.
+- [x] Approve revised plan before implementation.
+
+### Issue 24: Plan safe status workflow migration
+
+Status: Done
+
+Tasks:
+
+- [x] Document new delivery statuses: Backlog, Ready, In Progress, Review/UAT, Blocked, Done.
+- [x] Document old-to-new status mapping.
+- [x] Document that `task_status_history` should remain unchanged.
+- [x] Document rollback mapping and backup requirement.
+- [x] Implement migration after approval.
+
+### Issue 25: Plan Backlog and Board route changes
+
+Status: Done
+
+Tasks:
+
+- [x] Plan Tasks rename to Backlog.
+- [x] Plan Kanban rename to Board.
+- [x] Plan Dashboard summary cards moving into Reports.
+- [x] Plan compatibility redirects or aliases for old routes.
+- [x] Implement route changes after approval.
+
+### Issue 26: Plan sprint and assignment support
+
+Status: Done
+
+Tasks:
+
+- [x] Document new `sprints` table.
+- [x] Document nullable `tasks.sprint_id`.
+- [x] Document nullable `tasks.assignee_id`.
+- [x] Document keeping `owner_id` for backward compatibility.
+- [x] Document sprint MVP: create sprint, assign task, board filter, report summary.
+- [x] Implement sprint migration after approval.
+
+### Issue 27: Plan revised roles and auth hardening
+
+Status: Done
+
+Tasks:
+
+- [x] Document business role labels: Lead, Developer, Reporter, Stakeholder.
+- [x] Document internal role mapping: admin, developer, team, viewer.
+- [x] Document no public self-registration.
+- [x] Document manual Supabase user creation for this phase.
+- [x] Implement UI label changes and auth documentation after approval.
+
+### Issue 28: Revised implementation phases
+
+Status: Done
+
+Tasks:
+
+- [x] Phase 6: Planning and compatibility.
+- [x] Phase 7: Status migration and route rename.
+- [x] Phase 8: Sprint and assignment foundation.
+- [x] Phase 9: Board sprint filter and reports.
+- [x] Defer Admin UI.
+- [x] Begin Phase 6 only after approval.
+
+### Issue 29: Phase 6 navigation refactor
+
+Status: Done
+
+Tasks:
+
+- [x] Replace primary navigation with Backlog, Board, and Reports.
+- [x] Hide Dashboard from navigation.
+- [x] Redirect `/dashboard` to `/reports`.
+- [x] Redirect `/tasks` to `/backlog`.
+- [x] Redirect `/kanban` to `/board`.
+- [x] Update product label to Turtle Team Delivery Board.
+
+### Issue 30: Phase 7 workflow simplification
+
+Status: Done
+
+Tasks:
+
+- [x] Add migration `202606200001_delivery_board_refactor.sql`.
+- [x] Map current task statuses to Backlog, Ready, In Progress, Review/UAT, Blocked, and Done.
+- [x] Preserve `task_status_history` rows unchanged.
+- [x] Update app constants, badges, forms, and status controls.
+- [x] Update seed data to use `Backlog`.
+
+### Issue 31: Phase 8 sprint and assignment support
+
+Status: Done
+
+Tasks:
+
+- [x] Add `sprints` table with Planning, Active, and Completed statuses.
+- [x] Add nullable `tasks.sprint_id`.
+- [x] Add nullable `tasks.assignee_id`.
+- [x] Keep `owner_id` intact for backwards compatibility.
+- [x] Add sprint and assignee fields to task create/edit.
+- [x] Add sprint and assignee visibility to task detail.
+
+### Issue 32: Phase 9 board and reports refactor
+
+Status: Done
+
+Tasks:
+
+- [x] Add `/backlog` page with filters and exports.
+- [x] Add `/board` page filtered by selected or active sprint.
+- [x] Use Board columns Ready, In Progress, Review/UAT, Blocked, and Done.
+- [x] Keep status select controls; no drag-and-drop.
+- [x] Move dashboard metrics into `/reports`.
+- [x] Add report sections for sprint, status, epic, assignee, blocked tasks, and completed tasks.
+- [x] Keep report data query-based; no report tables.
+
+### Issue 33: Phase 6-9 verification
+
+Status: Done
+
+Tasks:
+
+- [x] Run lint.
+- [x] Run build.
+- [x] Push migration to linked Supabase project.
+
+### Issue 34: Board fallback when no Active sprint exists
+
+Status: Done
+
+Tasks:
+
+- [x] If an Active sprint exists, show tasks for the Active sprint by default.
+- [x] If no Active sprint exists, show all non-Done tasks, including Backlog.
+- [x] Keep manual sprint filtering available.
+- [x] Do not require sprints before the Board is useful.
+
+### Iteration 1 Validation Hold
+
+Status: Superseded By Admin Setup
+
+Tasks:
+
+- [x] Stop feature development after the Board fallback refinement.
+- [ ] Create Iteration 1 after Admin UI is verified.
+- [ ] Use the system with real work for at least one week.
+- [ ] Validate Backlog, Board, Reports, comments, status history, and exports with real team workflow.
+- [ ] Record workflow friction before adding more features.
+
+## Admin UI Phase
+
+### Issue 35: Add admin route access
+
+Status: Done
+
+Tasks:
+
+- [x] Add `/admin` page.
+- [x] Show Admin navigation only to internal `admin` users.
+- [x] Redirect non-admin users away from `/admin`.
+- [x] Keep auth and RLS unchanged.
+
+### Issue 36: Manage existing profiles
+
+Status: Done
+
+Tasks:
+
+- [x] List profiles.
+- [x] Show email, display name, role, and created date.
+- [x] Allow admin to update display name.
+- [x] Allow admin to update role.
+- [x] Use friendly role labels.
+- [x] Do not implement password reset.
+- [x] Do not implement public signup.
+
+### Issue 37: Manage iterations
+
+Status: Done
+
+Tasks:
+
+- [x] List iterations.
+- [x] Create iteration.
+- [x] Edit iteration.
+- [x] Set iteration Active.
+- [x] Mark iteration Completed.
+- [x] Clear other Active iterations before setting one Active.
+
+### Issue 38: Add task setup helper
+
+Status: Done
+
+Tasks:
+
+- [x] Show active tasks missing assignee or iteration.
+- [x] Allow admin to assign assignee.
+- [x] Allow admin to assign iteration.
+- [x] Link to task detail.
+
+### Issue 39: Admin verification
+
+Status: Pending Browser Verification
+
+Tasks:
+
+- [x] Run lint.
+- [x] Run build.
+- [ ] Browser-test admin access.
+- [ ] Browser-test non-admin redirect.
+- [ ] Browser-test creating an iteration.
+- [ ] Browser-test updating a user role.
+- [ ] Browser-test assigning a task to iteration/assignee.
+
+### Feature Hold After Admin
+
+Status: Active
+
+Tasks:
+
+- [x] Stop after Admin UI.
+- [ ] Do not implement notifications.
+- [ ] Enter initial real tasks.
+- [ ] Use workflow before adding complexity.
+
 ## Architecture Decisions
 
 ### ADR-001: Database trigger owns status history
@@ -326,3 +564,39 @@ The schema includes `task_attachments` for future compatibility, but the MVP use
 ### ADR-004: No drag-and-drop in MVP
 
 Status changes will use buttons or select controls. Drag-and-drop is deferred.
+
+### ADR-005: Keep internal role values during Delivery Board transition
+
+Use business-friendly UI labels while keeping existing database role values: `admin` as Lead, `developer` as Developer, `team` as Reporter, and `viewer` as Stakeholder. This avoids unnecessary RLS churn.
+
+### ADR-006: Preserve status history during status migration
+
+Task current statuses can be mapped to the new delivery workflow, but historical status rows should remain unchanged as audit history.
+
+### ADR-007: Add sprint support with nullable fields
+
+Sprint support should add `sprints`, `tasks.sprint_id`, and `tasks.assignee_id` without removing or repurposing `owner_id` in the first migration.
+
+### ADR-008: Backlog owns planning and Board owns iteration execution
+
+Backlog shows all tasks and supports triage, filtering, creation, and export. Board is intentionally narrower when sprint context exists and uses execution statuses. If an Active or selected sprint exists, Board shows sprint tasks. If no Active sprint exists, Board falls back to all non-Done tasks, including Backlog, so the team can work without sprint setup.
+
+### ADR-009: Keep Dashboard as a redirect only
+
+Dashboard is no longer a standalone surface. Its metrics live at the top of Reports, and `/dashboard` redirects to `/reports` for backwards compatibility.
+
+### ADR-010: No Admin UI in this refactor
+
+User creation and role assignment remain in Supabase for now. The app only shows friendly role labels while keeping the existing internal role values and RLS unchanged.
+
+### ADR-011: Validate Iteration 1 before adding features
+
+After the Board fallback refinement, feature development stops. The team should create Iteration 1 and use the system with real work for at least one week before introducing additional features.
+
+### ADR-012: Minimal Admin UI Uses Existing RLS
+
+Admin UI manages existing profiles, iterations, and task setup using server actions with the signed-in user's Supabase session. It does not use a client-side service-role key and does not implement password reset or public signup. If future user creation is needed inside the app, it should use a server-only service role path after a separate security review.
+
+### ADR-013: Notifications Remain Deferred
+
+Notifications are not part of this phase. They should not be implemented until initial tasks have been entered and the team has validated the workflow with real work.

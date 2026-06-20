@@ -1,10 +1,47 @@
 # AGENTS.md
 
+## Current Direction
+
+The product is now the Turtle Team Delivery Board.
+
+Primary navigation:
+
+* Backlog
+* Board
+* Reports
+* Admin, visible only to internal `admin` users
+
+Current delivery statuses:
+
+1. Backlog
+2. Ready
+3. In Progress
+4. Review/UAT
+5. Blocked
+6. Done
+
+Sprint/iteration support is intentionally lightweight. Board uses an Active iteration when one exists. If no Active iteration exists, Board falls back to all non-Done tasks, including Backlog.
+
+Admin UI is minimal and should stay simple:
+
+* List and update existing profiles.
+* Update display names and internal roles.
+* List, create, edit, activate, and complete iterations.
+* Help assign active tasks to assignees and iterations.
+* Do not implement password reset yet.
+* Do not implement public signup.
+* Do not expose service-role or secret keys to the client.
+* Use server actions and existing Supabase RLS wherever possible.
+
+Notifications are deferred. Do not implement notifications until real work has been entered and the workflow has been tested.
+
+Drag-and-drop remains deferred unless it can be implemented simply and reliably. Keep status select controls as the stable path.
+
 ## Project
 
-Turtle Wishlist Tracker
+Turtle Team Delivery Board
 
-A lightweight task tracking web app for the Turtle Research Team. It replaces the current Word-based "Turtles Wishlist Jobs" template and avoids duplicated manual updates across Job List, Kanban, Work Log, UAT notes, and release tracking.
+A lightweight delivery management web app for the Turtle Research Team. It replaces the current Word-based "Turtles Wishlist Jobs" template and avoids duplicated manual updates across Backlog, Board, Reports, Work Log, UAT notes, and release tracking.
 
 This is not intended to be a Jira clone. Keep the app simple, practical, and field-team friendly.
 

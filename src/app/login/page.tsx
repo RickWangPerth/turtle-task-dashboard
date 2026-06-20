@@ -15,7 +15,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   } = await supabase.auth.getUser();
 
   if (user) {
-    redirect("/dashboard");
+    redirect("/backlog");
   }
 
   return (
@@ -26,7 +26,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             Turtle Research Team
           </p>
           <h1 className="mt-2 text-2xl font-semibold text-ink">
-            Turtle Wishlist Tracker
+            Turtle Team Delivery Board
           </h1>
           <p className="mt-3 text-sm leading-6 text-muted">
             Sign in with a test password locally, or request a magic link.

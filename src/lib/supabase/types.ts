@@ -39,15 +39,16 @@ export type Database = {
           epic: string | null;
           priority: "P1" | "P2" | "P3";
           status:
-            | "To Do"
-            | "Info Needed"
+            | "Backlog"
+            | "Ready"
             | "In Progress"
-            | "Under Test"
-            | "Done"
-            | "Go Prod"
-            | "Closed";
+            | "Review/UAT"
+            | "Blocked"
+            | "Done";
           requester: string | null;
           owner_id: string | null;
+          assignee_id: string | null;
+          sprint_id: string | null;
           details: string | null;
           decision_needed: string | null;
           acceptance_criteria: string | null;
@@ -72,15 +73,16 @@ export type Database = {
           epic?: string | null;
           priority?: "P1" | "P2" | "P3";
           status?:
-            | "To Do"
-            | "Info Needed"
+            | "Backlog"
+            | "Ready"
             | "In Progress"
-            | "Under Test"
-            | "Done"
-            | "Go Prod"
-            | "Closed";
+            | "Review/UAT"
+            | "Blocked"
+            | "Done";
           requester?: string | null;
           owner_id?: string | null;
+          assignee_id?: string | null;
+          sprint_id?: string | null;
           details?: string | null;
           decision_needed?: string | null;
           acceptance_criteria?: string | null;
@@ -103,15 +105,16 @@ export type Database = {
           epic?: string | null;
           priority?: "P1" | "P2" | "P3";
           status?:
-            | "To Do"
-            | "Info Needed"
+            | "Backlog"
+            | "Ready"
             | "In Progress"
-            | "Under Test"
-            | "Done"
-            | "Go Prod"
-            | "Closed";
+            | "Review/UAT"
+            | "Blocked"
+            | "Done";
           requester?: string | null;
           owner_id?: string | null;
+          assignee_id?: string | null;
+          sprint_id?: string | null;
           details?: string | null;
           decision_needed?: string | null;
           acceptance_criteria?: string | null;
@@ -125,6 +128,34 @@ export type Database = {
           prod_date?: string | null;
           version?: string | null;
           commit_url?: string | null;
+        };
+        Relationships: [];
+      };
+      sprints: {
+        Row: {
+          id: string;
+          name: string;
+          goal: string | null;
+          start_date: string | null;
+          end_date: string | null;
+          status: "Planning" | "Active" | "Completed";
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          goal?: string | null;
+          start_date?: string | null;
+          end_date?: string | null;
+          status?: "Planning" | "Active" | "Completed";
+          created_at?: string;
+        };
+        Update: {
+          name?: string;
+          goal?: string | null;
+          start_date?: string | null;
+          end_date?: string | null;
+          status?: "Planning" | "Active" | "Completed";
         };
         Relationships: [];
       };

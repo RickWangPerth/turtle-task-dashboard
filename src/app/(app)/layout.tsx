@@ -1,6 +1,9 @@
 import { redirect } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { createClient } from "@/lib/supabase/server";
+import type { Database } from "@/lib/supabase/types";
+
+type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
 export default async function ProtectedLayout({
   children,
@@ -16,5 +19,16 @@ export default async function ProtectedLayout({
     redirect("/login");
   }
 
-  return <AppShell email={user.email ?? "Signed in"}>{children}</AppShell>;
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+  const currentProfile = profile as Pick<Profile, "role"> | null;
+
+  return (
+    <AppShell email={user.email ?? "Signed in"} role={currentProfile?.role}>
+      {children}
+    </AppShell>
+  );
 }

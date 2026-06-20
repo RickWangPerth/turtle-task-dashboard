@@ -8,10 +8,12 @@ import type { Database } from "@/lib/supabase/types";
 
 type Task = Database["public"]["Tables"]["tasks"]["Row"];
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
+type Sprint = Database["public"]["Tables"]["sprints"]["Row"];
 
 type TaskFormProps = {
   action: (formData: FormData) => void;
   profiles: Profile[];
+  sprints?: Sprint[];
   task?: Task;
   submitLabel: string;
 };
@@ -38,7 +40,13 @@ function Field({
 const inputClass =
   "w-full rounded-md border border-border bg-white px-3 py-2 text-sm text-ink outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200";
 
-export function TaskForm({ action, profiles, task, submitLabel }: TaskFormProps) {
+export function TaskForm({
+  action,
+  profiles,
+  sprints = [],
+  task,
+  submitLabel,
+}: TaskFormProps) {
   return (
     <form action={action} className="space-y-8">
       <section className="rounded-lg border border-border bg-white p-6 shadow-sm">
@@ -79,7 +87,7 @@ export function TaskForm({ action, profiles, task, submitLabel }: TaskFormProps)
             <select
               className={inputClass}
               name="status"
-              defaultValue={task?.status ?? "To Do"}
+              defaultValue={task?.status ?? "Backlog"}
             >
               {TASK_STATUSES.map((status) => (
                 <option key={status} value={status}>
@@ -114,11 +122,11 @@ export function TaskForm({ action, profiles, task, submitLabel }: TaskFormProps)
               defaultValue={task?.requester ?? ""}
             />
           </Field>
-          <Field label="Owner">
+          <Field label="Assignee">
             <select
               className={inputClass}
-              name="owner_id"
-              defaultValue={task?.owner_id ?? ""}
+              name="assignee_id"
+              defaultValue={task?.assignee_id ?? task?.owner_id ?? ""}
             >
               <option value="">Unassigned</option>
               {profiles.map((profile) => (
@@ -128,6 +136,21 @@ export function TaskForm({ action, profiles, task, submitLabel }: TaskFormProps)
               ))}
             </select>
           </Field>
+          <Field label="Sprint">
+            <select
+              className={inputClass}
+              name="sprint_id"
+              defaultValue={task?.sprint_id ?? ""}
+            >
+              <option value="">No sprint</option>
+              {sprints.map((sprint) => (
+                <option key={sprint.id} value={sprint.id}>
+                  {sprint.name} ({sprint.status})
+                </option>
+              ))}
+            </select>
+          </Field>
+          <input name="owner_id" type="hidden" value={task?.owner_id ?? ""} />
           <div className="md:col-span-2">
             <Field label="Details">
               <textarea

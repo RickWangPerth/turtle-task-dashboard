@@ -19,6 +19,7 @@ type Task = Database["public"]["Tables"]["tasks"]["Row"];
 type TaskComment = Database["public"]["Tables"]["task_comments"]["Row"];
 type StatusHistory =
   Database["public"]["Tables"]["task_status_history"]["Row"];
+type Sprint = Database["public"]["Tables"]["sprints"]["Row"];
 
 function profileName(profile: Profile | null | undefined) {
   return profile?.display_name ?? profile?.email ?? "-";
@@ -209,6 +210,8 @@ export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
 
   const [
     { data: owner },
+    { data: assignee },
+    { data: sprint },
     { data: creator },
     { data: comments },
     { data: histories },
@@ -219,6 +222,20 @@ export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
           .from("profiles")
           .select("*")
           .eq("id", currentTask.owner_id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+    currentTask.assignee_id
+      ? supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", currentTask.assignee_id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+    currentTask.sprint_id
+      ? supabase
+          .from("sprints")
+          .select("*")
+          .eq("id", currentTask.sprint_id)
           .maybeSingle()
       : Promise.resolve({ data: null }),
     currentTask.created_by
@@ -254,9 +271,9 @@ export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
           <>
             <Link
               className="rounded-md border border-border bg-white px-4 py-2.5 text-sm font-semibold text-ink hover:bg-slate-50"
-              href="/tasks"
+              href="/backlog"
             >
-              Back to tasks
+              Back to backlog
             </Link>
             <Link
               className="rounded-md bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-700"
@@ -279,6 +296,14 @@ export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
         <dl className="mt-6 grid gap-5 md:grid-cols-3">
           <DetailItem label="Epic" value={currentTask.epic} />
           <DetailItem label="Requester" value={currentTask.requester} />
+          <DetailItem
+            label="Assignee"
+            value={profileName((assignee as Profile | null) ?? owner)}
+          />
+          <DetailItem
+            label="Sprint"
+            value={(sprint as Sprint | null)?.name ?? "-"}
+          />
           <DetailItem label="Owner" value={profileName(owner)} />
           <DetailItem label="Created by" value={profileName(creator)} />
           <DetailItem

@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Turtle Wishlist Tracker",
-  description: "Internal task tracker for the Turtle Research Team",
+  title: "Turtle Team Delivery Board",
+  description: "Internal delivery board for the Turtle Research Team",
 };
 
 export default function RootLayout({

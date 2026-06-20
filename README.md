@@ -1,6 +1,6 @@
-# Turtle Wishlist Tracker
+# Turtle Team Delivery Board
 
-Lightweight task tracking app for the Turtle Research Team.
+Lightweight delivery board for the Turtle Research Team.
 
 ## Setup
 
@@ -16,9 +16,15 @@ npm install
 npm run dev
 ```
 
-## MVP Notes
+## Operation Notes
 
 - Role management UI is intentionally deferred.
-- Assign the first admin manually in Supabase by updating `public.profiles.role`.
+- Create users manually in Supabase Auth; public self-registration should remain disabled in Supabase settings.
+- Assign the first Lead manually in Supabase by updating `public.profiles.role` to `admin`.
+- Internal roles remain `admin`, `developer`, `team`, and `viewer`; the UI labels them Lead, Developer, Reporter, and Stakeholder.
 - Status history is recorded by a database trigger on `tasks.status` changes.
 - File uploads are not part of MVP; use `related_url` and `screenshot_url`.
+- Board work uses an `Active` sprint when one exists. If there is no Active sprint, the Board falls back to all non-Done tasks, including Backlog.
+- After Phase 6-9, stop feature development and validate Iteration 1 with real work for at least one week before adding more features.
+- `/admin` is available only to internal `admin` users. It manages existing profiles, iterations, and task setup through server actions and RLS-compatible Supabase operations.
+- Notifications are intentionally deferred until real workflow usage has been tested.

@@ -1,19 +1,16 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { PageHeader } from "@/components/page-header";
 import { PriorityBadge, StatusBadge } from "@/components/badges";
 import { createClient } from "@/lib/supabase/server";
 import { TASK_STATUSES, type TaskStatus } from "@/lib/tasks/constants";
 import { formatDateTime } from "@/lib/tasks/format";
-import { buildExportHref, type Task } from "@/lib/tasks/query";
-
-const openStatuses = new Set([
-  "To Do",
-  "Info Needed",
-  "In Progress",
-  "Under Test",
-  "Done",
-  "Go Prod",
-]);
+import {
+  buildExportHref,
+  type Profile,
+  type Sprint,
+  type Task,
+} from "@/lib/tasks/query";
 
 function ReportCard({
   children,
@@ -27,6 +24,15 @@ function ReportCard({
       <h2 className="text-base font-semibold text-ink">{title}</h2>
       <div className="mt-4">{children}</div>
     </section>
+  );
+}
+
+function MetricCard({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-lg border border-border bg-white p-5 shadow-sm">
+      <p className="text-sm font-medium text-muted">{label}</p>
+      <p className="mt-3 text-3xl font-semibold text-ink">{value}</p>
+    </div>
   );
 }
 
@@ -64,6 +70,10 @@ function TaskMiniList({ tasks }: { tasks: Task[] }) {
 }
 
 function CountList({ counts }: { counts: Array<[string, number]> }) {
+  if (!counts.length) {
+    return <p className="text-sm text-muted">No data.</p>;
+  }
+
   return (
     <ul className="divide-y divide-border text-sm">
       {counts.map(([label, count]) => (
@@ -78,40 +88,66 @@ function CountList({ counts }: { counts: Array<[string, number]> }) {
   );
 }
 
-function groupCounts(tasks: Task[], key: keyof Task) {
+function groupCounts(tasks: Task[], getLabel: (task: Task) => string) {
   const counts = new Map<string, number>();
 
   for (const task of tasks) {
-    const label = String(task[key] ?? "Unspecified");
+    const label = getLabel(task);
     counts.set(label, (counts.get(label) ?? 0) + 1);
   }
 
   return Array.from(counts.entries()).sort((a, b) => a[0].localeCompare(b[0]));
 }
 
+function profileName(profile: Profile | undefined) {
+  return profile?.display_name ?? profile?.email ?? "Unassigned";
+}
+
 export default async function ReportsPage() {
   const supabase = createClient();
-  const { data, error } = await supabase
-    .from("tasks")
-    .select("*")
-    .order("updated_at", { ascending: false });
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (error) {
-    throw new Error(error.message);
+  if (!user) {
+    redirect("/login");
   }
 
-  const tasks = (data ?? []) as Task[];
-  const openP1P2 = tasks.filter(
-    (task) =>
-      (task.priority === "P1" || task.priority === "P2") &&
-      openStatuses.has(task.status),
-  );
-  const infoNeeded = tasks.filter((task) => task.status === "Info Needed");
-  const underTest = tasks.filter((task) => task.status === "Under Test");
-  const goProd = tasks.filter((task) => task.status === "Go Prod");
-  const recentlyCompleted = tasks
-    .filter((task) => task.status === "Done" || task.status === "Closed")
-    .slice(0, 8);
+  const [
+    { data: taskData, error: tasksError },
+    { data: profileData },
+    { data: sprintData, error: sprintsError },
+  ] = await Promise.all([
+    supabase
+      .from("tasks")
+      .select("*")
+      .order("updated_at", { ascending: false }),
+    supabase.from("profiles").select("*"),
+    supabase.from("sprints").select("*").order("created_at", {
+      ascending: false,
+    }),
+  ]);
+
+  if (tasksError) {
+    throw new Error(tasksError.message);
+  }
+
+  if (sprintsError) {
+    throw new Error(sprintsError.message);
+  }
+
+  const tasks = (taskData ?? []) as Task[];
+  const profiles = (profileData ?? []) as Profile[];
+  const sprints = (sprintData ?? []) as Sprint[];
+  const profileMap = new Map(profiles.map((profile) => [profile.id, profile]));
+  const activeSprint = sprints.find((sprint) => sprint.status === "Active");
+  const activeSprintTasks = activeSprint
+    ? tasks.filter((task) => task.sprint_id === activeSprint.id)
+    : [];
+  const openTasks = tasks.filter((task) => task.status !== "Done");
+  const blockedTasks = tasks.filter((task) => task.status === "Blocked");
+  const completedTasks = tasks.filter((task) => task.status === "Done");
+  const recentlyCompleted = completedTasks.slice(0, 8);
 
   const statusCounts = TASK_STATUSES.map(
     (status) =>
@@ -120,12 +156,21 @@ export default async function ReportsPage() {
         tasks.filter((task) => task.status === status).length,
       ] as [TaskStatus, number],
   );
+  const epicCounts = groupCounts(tasks, (task) => task.epic ?? "Unspecified");
+  const assigneeCounts = groupCounts(tasks, (task) => {
+    const profile = task.assignee_id
+      ? profileMap.get(task.assignee_id)
+      : task.owner_id
+        ? profileMap.get(task.owner_id)
+        : undefined;
+    return profileName(profile);
+  });
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="Reports"
-        description="Simple project summaries generated directly from current task records."
+        description="Progress visibility generated from tasks, sprints, comments, and status history."
         actions={
           <>
             <Link
@@ -144,27 +189,53 @@ export default async function ReportsPage() {
         }
       />
 
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <MetricCard label="Total Tasks" value={tasks.length} />
+        <MetricCard label="Open Tasks" value={openTasks.length} />
+        <MetricCard
+          label="Current Sprint Tasks"
+          value={activeSprintTasks.length}
+        />
+        <MetricCard label="Blocked Tasks" value={blockedTasks.length} />
+        <MetricCard label="Completed Tasks" value={completedTasks.length} />
+      </section>
+
       <div className="grid gap-6 xl:grid-cols-2">
-        <ReportCard title="Open P1/P2 Tasks">
-          <TaskMiniList tasks={openP1P2} />
+        <ReportCard title="Current Sprint Summary">
+          {activeSprint ? (
+            <div className="space-y-3 text-sm">
+              <div>
+                <p className="font-semibold text-ink">{activeSprint.name}</p>
+                <p className="mt-1 text-muted">
+                  {activeSprint.goal || "No sprint goal recorded."}
+                </p>
+              </div>
+              <CountList
+                counts={TASK_STATUSES.map((status) => [
+                  status,
+                  activeSprintTasks.filter((task) => task.status === status)
+                    .length,
+                ])}
+              />
+            </div>
+          ) : (
+            <p className="text-sm text-muted">No active sprint.</p>
+          )}
         </ReportCard>
-        <ReportCard title="Info Needed Tasks">
-          <TaskMiniList tasks={infoNeeded} />
+        <ReportCard title="Tasks By Status">
+          <CountList counts={statusCounts} />
         </ReportCard>
-        <ReportCard title="Under Test Tasks">
-          <TaskMiniList tasks={underTest} />
+        <ReportCard title="Tasks By Epic">
+          <CountList counts={epicCounts} />
         </ReportCard>
-        <ReportCard title="Go Prod Tasks">
-          <TaskMiniList tasks={goProd} />
+        <ReportCard title="Tasks By Assignee">
+          <CountList counts={assigneeCounts} />
+        </ReportCard>
+        <ReportCard title="Blocked Tasks">
+          <TaskMiniList tasks={blockedTasks} />
         </ReportCard>
         <ReportCard title="Recently Completed Tasks">
           <TaskMiniList tasks={recentlyCompleted} />
-        </ReportCard>
-        <ReportCard title="Tasks Grouped By Epic">
-          <CountList counts={groupCounts(tasks, "epic")} />
-        </ReportCard>
-        <ReportCard title="Tasks Grouped By Status">
-          <CountList counts={statusCounts} />
         </ReportCard>
       </div>
     </div>

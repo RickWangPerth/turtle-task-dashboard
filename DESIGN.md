@@ -1,12 +1,49 @@
 # DESIGN.md
 
+## Current Product Direction
+
+The product is now Turtle Team Delivery Board.
+
+The app is organized around:
+
+* Backlog - incoming and planned work
+* Board - current delivery execution
+* Reports - progress visibility
+* Admin - small-team setup, visible only to internal `admin` users
+
+Dashboard is no longer a standalone page. Kanban is now Board. The app should remain lightweight and should not become Jira.
+
+Current statuses:
+
+* Backlog
+* Ready
+* In Progress
+* Review/UAT
+* Blocked
+* Done
+
+Iteration behavior:
+
+* If an Active iteration exists, Board shows that iteration by default.
+* If no Active iteration exists, Board shows all non-Done tasks, including Backlog.
+* Drag-and-drop is deferred; status select controls remain the stable workflow.
+
+Admin behavior:
+
+* Admin can manage existing profile display names and roles.
+* Admin can create/edit iterations and set one Active iteration.
+* Admin can assign tasks to assignees and iterations from a setup helper.
+* Admin does not manage passwords.
+* Public signup is not exposed.
+* Notifications are deferred until the workflow has been tested with real work.
+
 ## Product Name
 
-Turtle Wishlist Tracker
+Turtle Team Delivery Board
 
 ## Product Summary
 
-Turtle Wishlist Tracker is a lightweight project tracking system for the Turtle Research Team. It replaces a manual Word-based job tracking template with a structured web app.
+Turtle Team Delivery Board is a lightweight delivery tracking system for the Turtle Research Team. It replaces a manual Word-based job tracking template with a structured web app.
 
 The current manual process has several repeated areas:
 
