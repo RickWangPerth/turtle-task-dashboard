@@ -14,7 +14,7 @@ Primary navigation:
 Current delivery statuses:
 
 1. Backlog
-2. Ready
+2. To Do
 3. In Progress
 4. Review/UAT
 5. Blocked

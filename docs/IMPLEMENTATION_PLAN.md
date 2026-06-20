@@ -9,7 +9,7 @@ Delivered scope:
 - Navigation is Backlog, Board, and Reports.
 - `/dashboard`, `/tasks`, and `/kanban` remain as compatibility redirects.
 - Dashboard metrics are moved into Reports.
-- Delivery statuses are simplified to `Backlog`, `Ready`, `In Progress`, `Review/UAT`, `Blocked`, and `Done`.
+- Delivery statuses are simplified to `Backlog`, `To Do`, `In Progress`, `Review/UAT`, `Blocked`, and `Done`.
 - Existing task statuses are mapped safely in a database migration.
 - `task_status_history` is preserved unchanged as audit history.
 - Sprint support is added with `sprints`, `tasks.sprint_id`, and `tasks.assignee_id`.
@@ -89,7 +89,7 @@ Board replaces/refines the current Kanban page. It should focus on active delive
 Delivery statuses:
 
 - Backlog
-- Ready
+- To Do
 - In Progress
 - Review/UAT
 - Blocked
@@ -97,7 +97,7 @@ Delivery statuses:
 
 Board columns:
 
-- Ready
+- To Do
 - In Progress
 - Review/UAT
 - Blocked
@@ -218,7 +218,7 @@ Plan:
 
 1. Add a compatibility migration that updates the `tasks.status` check constraint to allow the new statuses:
    - `Backlog`
-   - `Ready`
+   - `To Do`
    - `In Progress`
    - `Review/UAT`
    - `Blocked`
@@ -301,7 +301,7 @@ Recommendation: add new routes and redirects rather than breaking existing URLs 
 ### Board UI
 
 - Move current Kanban experience to `/board`.
-- Use columns Ready, In Progress, Review/UAT, Blocked, Done.
+- Use columns To Do, In Progress, Review/UAT, Blocked, Done.
 - Exclude Backlog tasks by default.
 - Add sprint filter once sprint table exists.
 - Continue with status select + save on cards.
@@ -348,7 +348,7 @@ Rollback:
 - Restore the previous status constraint.
 - Map new values back only if absolutely required:
   - `Backlog` -> `To Do`
-  - `Ready` -> `To Do`
+  - `To Do` -> `To Do`
   - `Review/UAT` -> `Under Test`
   - `Done` -> `Done`
 - Keep a database backup before applying remote migration.

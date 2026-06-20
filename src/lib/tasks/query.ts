@@ -93,7 +93,7 @@ export function buildExportHref(
   const searchParams = new URLSearchParams();
 
   for (const [key, value] of Object.entries(params)) {
-    if (value) {
+    if (value && key !== "saved") {
       searchParams.set(key, value);
     }
   }

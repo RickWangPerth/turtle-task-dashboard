@@ -16,7 +16,7 @@ Dashboard is no longer a standalone page. Kanban is now Board. The app should re
 Current statuses:
 
 * Backlog
-* Ready
+* To Do
 * In Progress
 * Review/UAT
 * Blocked

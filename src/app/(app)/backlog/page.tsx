@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
+import { SaveNotice } from "@/components/save-notice";
 import { PriorityBadge, StatusBadge } from "@/components/badges";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -25,6 +26,7 @@ type BacklogPageProps = {
     epic?: string;
     priority?: string;
     q?: string;
+    saved?: string;
     sprint?: string;
     status?: string;
   };
@@ -113,6 +115,7 @@ export default async function BacklogPage({ searchParams }: BacklogPageProps) {
           </>
         }
       />
+      <SaveNotice saved={params.saved} />
 
       <form className="rounded-lg border border-border bg-white p-4 shadow-sm">
         <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-7">

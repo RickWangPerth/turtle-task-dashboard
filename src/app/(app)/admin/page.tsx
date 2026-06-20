@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { PageHeader } from "@/components/page-header";
+import { SaveNotice } from "@/components/save-notice";
 import { StatusBadge } from "@/components/badges";
 import { friendlyRoleLabel, ROLE_LABELS } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
@@ -18,6 +19,12 @@ import {
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 type Sprint = Database["public"]["Tables"]["sprints"]["Row"];
 type Task = Database["public"]["Tables"]["tasks"]["Row"];
+
+type AdminPageProps = {
+  searchParams?: {
+    saved?: string;
+  };
+};
 
 const roleEntries = Object.entries(ROLE_LABELS) as Array<
   [Profile["role"], string]
@@ -49,7 +56,7 @@ function dateInputValue(value: string | null) {
   return value ? value.slice(0, 10) : "";
 }
 
-export default async function AdminPage() {
+export default async function AdminPage({ searchParams }: AdminPageProps) {
   const supabase = createClient();
   const {
     data: { user },
@@ -114,6 +121,7 @@ export default async function AdminPage() {
         title="Admin"
         description="Small-team setup for users, iterations, and task assignment."
       />
+      <SaveNotice saved={searchParams?.saved} />
 
       <Section title="Users">
         <div className="overflow-x-auto">

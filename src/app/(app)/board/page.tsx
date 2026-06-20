@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { PageHeader } from "@/components/page-header";
 import { PriorityBadge } from "@/components/badges";
+import { SaveNotice } from "@/components/save-notice";
 import { createClient } from "@/lib/supabase/server";
 import {
   BOARD_STATUSES,
@@ -15,6 +16,7 @@ import type { Database } from "@/lib/supabase/types";
 type BoardPageProps = {
   searchParams?: {
     assignee?: string;
+    saved?: string;
     sprint?: string;
   };
 };
@@ -216,6 +218,7 @@ export default async function BoardPage({ searchParams }: BoardPageProps) {
             : "Current iteration execution by sprint. Backlog items stay on the Backlog page."
         }
       />
+      <SaveNotice saved={params.saved} />
 
       <form className="rounded-lg border border-border bg-white p-4 shadow-sm">
         <div className="grid gap-4 md:grid-cols-3">

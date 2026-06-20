@@ -21,13 +21,16 @@ export default async function ProtectedLayout({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role")
+    .select("display_name, role")
     .eq("id", user.id)
     .maybeSingle();
-  const currentProfile = profile as Pick<Profile, "role"> | null;
+  const currentProfile = profile as Pick<Profile, "display_name" | "role"> | null;
 
   return (
-    <AppShell email={user.email ?? "Signed in"} role={currentProfile?.role}>
+    <AppShell
+      email={currentProfile?.display_name ?? user.email ?? "Signed in"}
+      role={currentProfile?.role}
+    >
       {children}
     </AppShell>
   );

@@ -1,6 +1,6 @@
 export const TASK_STATUSES = [
   "Backlog",
-  "Ready",
+  "To Do",
   "In Progress",
   "Review/UAT",
   "Blocked",
@@ -8,7 +8,7 @@ export const TASK_STATUSES = [
 ] as const;
 
 export const BOARD_STATUSES = [
-  "Ready",
+  "To Do",
   "In Progress",
   "Review/UAT",
   "Blocked",

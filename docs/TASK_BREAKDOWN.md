@@ -330,7 +330,7 @@ Status: Done
 
 Tasks:
 
-- [x] Document new delivery statuses: Backlog, Ready, In Progress, Review/UAT, Blocked, Done.
+- [x] Document new delivery statuses: Backlog, To Do, In Progress, Review/UAT, Blocked, Done.
 - [x] Document old-to-new status mapping.
 - [x] Document that `task_status_history` should remain unchanged.
 - [x] Document rollback mapping and backup requirement.
@@ -406,7 +406,7 @@ Status: Done
 Tasks:
 
 - [x] Add migration `202606200001_delivery_board_refactor.sql`.
-- [x] Map current task statuses to Backlog, Ready, In Progress, Review/UAT, Blocked, and Done.
+- [x] Map current task statuses to Backlog, To Do, In Progress, Review/UAT, Blocked, and Done.
 - [x] Preserve `task_status_history` rows unchanged.
 - [x] Update app constants, badges, forms, and status controls.
 - [x] Update seed data to use `Backlog`.
@@ -432,7 +432,7 @@ Tasks:
 
 - [x] Add `/backlog` page with filters and exports.
 - [x] Add `/board` page filtered by selected or active sprint.
-- [x] Use Board columns Ready, In Progress, Review/UAT, Blocked, and Done.
+- [x] Use Board columns To Do, In Progress, Review/UAT, Blocked, and Done.
 - [x] Keep status select controls; no drag-and-drop.
 - [x] Move dashboard metrics into `/reports`.
 - [x] Add report sections for sprint, status, epic, assignee, blocked tasks, and completed tasks.
@@ -547,6 +547,31 @@ Tasks:
 - [ ] Enter initial real tasks.
 - [ ] Use workflow before adding complexity.
 
+### Issue 40: Rename Ready status to To Do
+
+Status: Done
+
+Tasks:
+
+- [x] Add migration `202606200002_ready_to_todo_status.sql`.
+- [x] Map existing `Ready` tasks to `To Do`.
+- [x] Update task status constraint.
+- [x] Update status constants, Supabase types, badges, and docs.
+- [x] Apply migration to linked Supabase project.
+
+### Issue 41: Add save confirmation feedback
+
+Status: Done
+
+Tasks:
+
+- [x] Add reusable save notice component.
+- [x] Show success notice after task create/update.
+- [x] Show success notice after task status update.
+- [x] Show success notice after comment creation.
+- [x] Show success notice after Admin user, iteration, and task setup updates.
+- [x] Browser-verify notice rendering.
+
 ## Architecture Decisions
 
 ### ADR-001: Database trigger owns status history
@@ -600,3 +625,7 @@ Admin UI manages existing profiles, iterations, and task setup using server acti
 ### ADR-013: Notifications Remain Deferred
 
 Notifications are not part of this phase. They should not be implemented until initial tasks have been entered and the team has validated the workflow with real work.
+
+### ADR-014: Use Page-Level Save Notices
+
+Save and update actions redirect back to the relevant page with a `saved` query parameter. Pages show a clear success notice near the top instead of using blocking modals or adding a toast library. This keeps feedback visible while avoiding extra client-side state.

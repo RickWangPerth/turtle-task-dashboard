@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/page-header";
+import { SaveNotice } from "@/components/save-notice";
 import { PriorityBadge, StatusBadge } from "@/components/badges";
 import { createClient } from "@/lib/supabase/server";
 import { TASK_STATUSES } from "@/lib/tasks/constants";
@@ -11,6 +12,9 @@ import type { Database } from "@/lib/supabase/types";
 type TaskDetailPageProps = {
   params: {
     id: string;
+  };
+  searchParams?: {
+    saved?: string;
   };
 };
 
@@ -194,7 +198,10 @@ function ActivitySection({
   );
 }
 
-export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
+export default async function TaskDetailPage({
+  params,
+  searchParams,
+}: TaskDetailPageProps) {
   const supabase = createClient();
   const { data: task, error } = await supabase
     .from("tasks")
@@ -284,6 +291,7 @@ export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
           </>
         }
       />
+      <SaveNotice saved={searchParams?.saved} />
 
       <section className="rounded-lg border border-border bg-white p-6 shadow-sm">
         <div className="flex flex-wrap gap-2">

@@ -120,9 +120,11 @@ export async function updateProfile(profileId: string, formData: FormData) {
   }
 
   revalidatePath("/admin");
+  revalidatePath("/", "layout");
   revalidatePath("/backlog");
   revalidatePath("/board");
   revalidatePath("/reports");
+  redirect("/admin?saved=profile");
 }
 
 export async function createIteration(formData: FormData) {
@@ -149,6 +151,7 @@ export async function createIteration(formData: FormData) {
   revalidatePath("/backlog");
   revalidatePath("/board");
   revalidatePath("/reports");
+  redirect("/admin?saved=iteration");
 }
 
 export async function updateIteration(sprintId: string, formData: FormData) {
@@ -176,6 +179,7 @@ export async function updateIteration(sprintId: string, formData: FormData) {
   revalidatePath("/backlog");
   revalidatePath("/board");
   revalidatePath("/reports");
+  redirect("/admin?saved=iteration");
 }
 
 export async function setIterationStatus(
@@ -205,6 +209,7 @@ export async function setIterationStatus(
   revalidatePath("/backlog");
   revalidatePath("/board");
   revalidatePath("/reports");
+  redirect("/admin?saved=iteration");
 }
 
 export async function updateTaskSetup(taskId: string, formData: FormData) {
@@ -231,4 +236,5 @@ export async function updateTaskSetup(taskId: string, formData: FormData) {
   revalidatePath("/backlog");
   revalidatePath("/board");
   revalidatePath(`/tasks/${taskId}`);
+  redirect("/admin?saved=task_setup");
 }

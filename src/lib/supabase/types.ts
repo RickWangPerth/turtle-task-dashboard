@@ -40,7 +40,7 @@ export type Database = {
           priority: "P1" | "P2" | "P3";
           status:
             | "Backlog"
-            | "Ready"
+            | "To Do"
             | "In Progress"
             | "Review/UAT"
             | "Blocked"
@@ -74,7 +74,7 @@ export type Database = {
           priority?: "P1" | "P2" | "P3";
           status?:
             | "Backlog"
-            | "Ready"
+            | "To Do"
             | "In Progress"
             | "Review/UAT"
             | "Blocked"
@@ -106,7 +106,7 @@ export type Database = {
           priority?: "P1" | "P2" | "P3";
           status?:
             | "Backlog"
-            | "Ready"
+            | "To Do"
             | "In Progress"
             | "Review/UAT"
             | "Blocked"

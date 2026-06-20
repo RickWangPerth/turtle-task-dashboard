@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -26,6 +27,13 @@ function requireOption<T extends readonly string[]>(
 ) {
   const text = String(value ?? "");
   return options.includes(text) ? (text as T[number]) : fallback;
+}
+
+function redirectBackWithSaved(saved: string, fallback = "/backlog") {
+  const referer = headers().get("referer");
+  const target = referer ? new URL(referer) : new URL(fallback, "http://local");
+  target.searchParams.set("saved", saved);
+  redirect(`${target.pathname}${target.search}`);
 }
 
 function getTaskPayload(formData: FormData) {
@@ -105,7 +113,7 @@ export async function createTask(formData: FormData) {
   revalidatePath("/backlog");
   revalidatePath("/board");
   revalidatePath("/reports");
-  redirect(`/tasks/${data.id}`);
+  redirect(`/tasks/${data.id}?saved=created`);
 }
 
 export async function updateTask(taskId: string, formData: FormData) {
@@ -130,7 +138,7 @@ export async function updateTask(taskId: string, formData: FormData) {
   revalidatePath("/board");
   revalidatePath("/reports");
   revalidatePath(`/tasks/${taskId}`);
-  redirect(`/tasks/${taskId}`);
+  redirect(`/tasks/${taskId}?saved=task`);
 }
 
 export async function createTaskComment(taskId: string, formData: FormData) {
@@ -168,6 +176,7 @@ export async function createTaskComment(taskId: string, formData: FormData) {
   }
 
   revalidatePath(`/tasks/${taskId}`);
+  redirect(`/tasks/${taskId}?saved=comment`);
 }
 
 export async function updateTaskStatus(taskId: string, formData: FormData) {
@@ -194,4 +203,5 @@ export async function updateTaskStatus(taskId: string, formData: FormData) {
   revalidatePath("/board");
   revalidatePath("/reports");
   revalidatePath(`/tasks/${taskId}`);
+  redirectBackWithSaved("status");
 }

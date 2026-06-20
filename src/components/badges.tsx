@@ -8,7 +8,7 @@ const priorityStyles: Record<TaskPriority, string> = {
 
 const statusStyles: Record<TaskStatus, string> = {
   Backlog: "border-slate-200 bg-slate-50 text-slate-700",
-  Ready: "border-sky-200 bg-sky-50 text-sky-800",
+  "To Do": "border-sky-200 bg-sky-50 text-sky-800",
   "In Progress": "border-blue-200 bg-blue-50 text-blue-800",
   "Review/UAT": "border-violet-200 bg-violet-50 text-violet-800",
   Blocked: "border-orange-200 bg-orange-50 text-orange-800",
