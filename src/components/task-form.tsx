@@ -221,7 +221,7 @@ export function TaskForm({
                 rows={6}
                 defaultValue={task?.implementation_plan ?? ""}
                 placeholder={
-                  "1. Update database schema\n2. Add validation logic\n3. Update export query\n4. UAT with James\n5. Deploy to PROD"
+                  "1. Update database schema\n2. Add validation logic\n3. Update export query\n4. UAT with Turtle team\n5. Deploy to PROD"
                 }
               />
             </Field>
@@ -234,7 +234,7 @@ export function TaskForm({
                 rows={6}
                 defaultValue={task?.completion_notes ?? ""}
                 placeholder={
-                  "Implemented:\n- Added new tag state\n\nTested:\n- UAT completed with James\n\nReleased:\n- PROD version 2.0.15"
+                  "Implemented:\n- Added new tag state\n\nTested:\n- UAT completed with Turtle team\n\nReleased:\n- PROD version 2.0.15"
                 }
               />
             </Field>
