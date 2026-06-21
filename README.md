@@ -30,3 +30,4 @@ npm run dev
 - Notifications are intentionally deferred until real workflow usage has been tested.
 - Imported wishlist tasks use `tasks.review_status` so Rick/Liz can triage them in Backlog.
 - One-time import SQL lives at `supabase/imports/initial_wishlist_tasks.sql`; it inserts directly into `public.tasks` and does not use import batch tables.
+- Delivery planning stays lightweight: `tasks.implementation_plan` records Rick's proposed approach, and `tasks.completion_notes` records what was implemented, tested, and released.

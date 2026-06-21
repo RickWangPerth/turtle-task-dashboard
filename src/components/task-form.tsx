@@ -213,6 +213,32 @@ export function TaskForm({
               />
             </Field>
           </div>
+          <div className="md:col-span-2">
+            <Field label="Implementation plan">
+              <textarea
+                className={inputClass}
+                name="implementation_plan"
+                rows={6}
+                defaultValue={task?.implementation_plan ?? ""}
+                placeholder={
+                  "1. Update database schema\n2. Add validation logic\n3. Update export query\n4. UAT with James\n5. Deploy to PROD"
+                }
+              />
+            </Field>
+          </div>
+          <div className="md:col-span-2">
+            <Field label="Completion notes">
+              <textarea
+                className={inputClass}
+                name="completion_notes"
+                rows={6}
+                defaultValue={task?.completion_notes ?? ""}
+                placeholder={
+                  "Implemented:\n- Added new tag state\n\nTested:\n- UAT completed with James\n\nReleased:\n- PROD version 2.0.15"
+                }
+              />
+            </Field>
+          </div>
           <Field label="Start date">
             <input
               className={inputClass}

@@ -386,6 +386,14 @@ export default async function TaskDetailPage({
         label="Acceptance criteria"
         value={currentTask.acceptance_criteria}
       />
+      <TextBlock
+        label="Implementation Plan"
+        value={currentTask.implementation_plan}
+      />
+      <TextBlock
+        label="Completion Notes"
+        value={currentTask.completion_notes}
+      />
       <TextBlock label="Client comment" value={currentTask.client_comment} />
 
       <ActivitySection

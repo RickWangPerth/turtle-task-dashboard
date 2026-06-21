@@ -58,6 +58,8 @@ export type Database = {
           details: string | null;
           decision_needed: string | null;
           acceptance_criteria: string | null;
+          implementation_plan: string | null;
+          completion_notes: string | null;
           client_comment: string | null;
           environment: "Local" | "UAT" | "PROD" | "NA";
           related_url: string | null;
@@ -98,6 +100,8 @@ export type Database = {
           details?: string | null;
           decision_needed?: string | null;
           acceptance_criteria?: string | null;
+          implementation_plan?: string | null;
+          completion_notes?: string | null;
           client_comment?: string | null;
           environment?: "Local" | "UAT" | "PROD" | "NA";
           related_url?: string | null;
@@ -136,6 +140,8 @@ export type Database = {
           details?: string | null;
           decision_needed?: string | null;
           acceptance_criteria?: string | null;
+          implementation_plan?: string | null;
+          completion_notes?: string | null;
           client_comment?: string | null;
           environment?: "Local" | "UAT" | "PROD" | "NA";
           related_url?: string | null;

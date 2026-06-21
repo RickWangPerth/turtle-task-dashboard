@@ -65,6 +65,8 @@ function getTaskPayload(formData: FormData) {
     details: emptyToNull(formData.get("details")),
     decision_needed: emptyToNull(formData.get("decision_needed")),
     acceptance_criteria: emptyToNull(formData.get("acceptance_criteria")),
+    implementation_plan: emptyToNull(formData.get("implementation_plan")),
+    completion_notes: emptyToNull(formData.get("completion_notes")),
     client_comment: emptyToNull(formData.get("client_comment")),
     environment: requireOption(
       formData.get("environment"),

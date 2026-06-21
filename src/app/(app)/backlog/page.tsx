@@ -286,9 +286,9 @@ export default async function BacklogPage({ searchParams }: BacklogPageProps) {
               <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-muted">
                 <tr>
                   <th className="px-4 py-3">Code</th>
+                  <th className="px-4 py-3">Priority</th>
                   <th className="px-4 py-3">Title</th>
                   <th className="px-4 py-3">Epic</th>
-                  <th className="px-4 py-3">Priority</th>
                   <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3">Review</th>
                   <th className="px-4 py-3">Requester</th>
@@ -319,6 +319,9 @@ export default async function BacklogPage({ searchParams }: BacklogPageProps) {
                           {task.task_code}
                         </Link>
                       </td>
+                      <td className="px-4 py-3">
+                        <PriorityBadge priority={task.priority} />
+                      </td>
                       <td className="min-w-72 px-4 py-3">
                         <Link
                           className={
@@ -333,9 +336,6 @@ export default async function BacklogPage({ searchParams }: BacklogPageProps) {
                       </td>
                       <td className="px-4 py-3 text-muted">
                         {task.epic ?? "-"}
-                      </td>
-                      <td className="px-4 py-3">
-                        <PriorityBadge priority={task.priority} />
                       </td>
                       <td className="px-4 py-3">
                         <StatusBadge status={task.status} />

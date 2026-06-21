@@ -46,6 +46,9 @@ Admin behavior:
 * Notifications are deferred until the workflow has been tested with real work.
 * Bulk import is one-time only and inserts directly into `public.tasks`.
 * Do not add import batch tables.
+* Implementation planning is captured on the task record using `implementation_plan`.
+* Completion tracking is captured on the task record using `completion_notes`.
+* Do not add subtasks, dependency tables, checklist tables, story points, velocity tracking, or workflow engines.
 
 ## Product Name
 

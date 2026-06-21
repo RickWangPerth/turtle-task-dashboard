@@ -600,6 +600,20 @@ Tasks:
 - [x] Use `environment = NA`.
 - [x] Use `requester = Turtle Team` where requester is not known.
 
+### Issue 44: Add lightweight delivery planning fields
+
+Status: Done
+
+Tasks:
+
+- [x] Add `tasks.implementation_plan`.
+- [x] Add `tasks.completion_notes`.
+- [x] Display Implementation Plan on task detail.
+- [x] Display Completion Notes on task detail.
+- [x] Allow editing both fields from task edit form.
+- [x] Keep existing task edit permissions.
+- [x] Do not add subtasks, dependencies, checklist tables, workflow engines, story points, or velocity tracking.
+
 ## Architecture Decisions
 
 ### ADR-001: Database trigger owns status history
@@ -661,3 +675,7 @@ Save and update actions redirect back to the relevant page with a `saved` query 
 ### ADR-015: One-Time Import Uses Task Review Status
 
 Initial wishlist import is a one-time SQL script that inserts directly into `public.tasks`. Imported tasks are marked with `review_status = 'Needs Review'`. No import batch table, dependency model, voting system, notification workflow, upload flow, or automatic AI classification is added.
+
+### ADR-016: Delivery Planning Stays On The Task
+
+Implementation planning and completion tracking are stored directly on `tasks` as `implementation_plan` and `completion_notes`. This supports Rick's review/planning workflow and Liz's completion handoff without adding subtasks, dependency tables, checklist tables, story points, velocity tracking, or workflow engines.

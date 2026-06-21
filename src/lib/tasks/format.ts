@@ -4,6 +4,7 @@ export function formatDate(value: string | null) {
   }
 
   return new Intl.DateTimeFormat("en-AU", {
+    timeZone: "Australia/Perth",
     day: "2-digit",
     month: "short",
     year: "numeric",
@@ -28,4 +29,3 @@ export function emptyToNull(value: FormDataEntryValue | null) {
   const text = String(value ?? "").trim();
   return text.length > 0 ? text : null;
 }
-
