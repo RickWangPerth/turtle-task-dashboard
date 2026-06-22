@@ -2,7 +2,7 @@ export const ROLE_LABELS = {
   admin: "Lead",
   developer: "Developer",
   team: "Reporter",
-  viewer: "Stakeholder",
+  viewer: "Project Manager",
 } as const;
 
 export type AppRole = keyof typeof ROLE_LABELS;
@@ -13,4 +13,8 @@ export function friendlyRoleLabel(role: string | null | undefined) {
   }
 
   return null;
+}
+
+export function canSeeDeliveryFields(role: string | null | undefined) {
+  return role === "admin" || role === "developer";
 }

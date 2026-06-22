@@ -2,11 +2,20 @@ import { PageHeader } from "@/components/page-header";
 import { TaskForm } from "@/components/task-form";
 import { createClient } from "@/lib/supabase/server";
 import { createTask } from "../actions";
+import type { Database } from "@/lib/supabase/types";
+
+type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
 export default async function NewTaskPage() {
   const supabase = createClient();
-  const [{ data: profiles, error }, { data: sprints, error: sprintsError }] =
-    await Promise.all([
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const [
+    { data: profiles, error },
+    { data: sprints, error: sprintsError },
+    { data: currentProfile },
+  ] = await Promise.all([
       supabase
         .from("profiles")
         .select("*")
@@ -15,11 +24,16 @@ export default async function NewTaskPage() {
         .from("sprints")
         .select("*")
         .order("start_date", { ascending: false }),
+      user
+        ? supabase.from("profiles").select("role").eq("id", user.id).maybeSingle()
+        : Promise.resolve({ data: null }),
     ]);
 
   if (error || sprintsError) {
     throw new Error(error?.message ?? sprintsError?.message);
   }
+  const currentRole =
+    (currentProfile as Pick<Profile, "role"> | null)?.role ?? null;
 
   return (
     <div className="space-y-6">
@@ -30,6 +44,7 @@ export default async function NewTaskPage() {
       <TaskForm
         action={createTask}
         profiles={profiles ?? []}
+        role={currentRole}
         sprints={sprints ?? []}
         submitLabel="Create task"
       />

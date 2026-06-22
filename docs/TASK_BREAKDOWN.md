@@ -367,7 +367,7 @@ Status: Done
 
 Tasks:
 
-- [x] Document business role labels: Lead, Developer, Reporter, Stakeholder.
+- [x] Document business role labels: Lead, Developer, Reporter, Project Manager.
 - [x] Document internal role mapping: admin, developer, team, viewer.
 - [x] Document no public self-registration.
 - [x] Document manual Supabase user creation for this phase.
@@ -634,7 +634,7 @@ Status changes will use buttons or select controls. Drag-and-drop is deferred.
 
 ### ADR-005: Keep internal role values during Delivery Board transition
 
-Use business-friendly UI labels while keeping existing database role values: `admin` as Lead, `developer` as Developer, `team` as Reporter, and `viewer` as Stakeholder. This avoids unnecessary RLS churn.
+Use business-friendly UI labels while keeping existing database role values: `admin` as Lead, `developer` as Developer, `team` as Reporter, and `viewer` as Project Manager. This avoids unnecessary RLS churn.
 
 ### ADR-006: Preserve status history during status migration
 
@@ -679,3 +679,7 @@ Initial wishlist import is a one-time SQL script that inserts directly into `pub
 ### ADR-016: Delivery Planning Stays On The Task
 
 Implementation planning and completion tracking are stored directly on `tasks` as `implementation_plan` and `completion_notes`. This supports Rick's review/planning workflow and Liz's completion handoff without adding subtasks, dependency tables, checklist tables, story points, velocity tracking, or workflow engines.
+
+### ADR-017: Hide delivery-only fields from non-delivery roles
+
+Reporter and Project Manager users should see the request and progress information they need, while Lead and Developer users maintain delivery fields such as epic, assignee, sprint, review status, environment, implementation plan, completion notes, UAT date, PROD date, version, and commit URL. The database fields remain unchanged so existing tasks and exports are not broken.

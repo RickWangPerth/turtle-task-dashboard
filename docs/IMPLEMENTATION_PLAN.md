@@ -16,7 +16,8 @@ Delivered scope:
 - `owner_id` remains intact for backwards compatibility.
 - Board shows selected/current sprint work when a sprint exists, and otherwise falls back to all non-Done tasks, including Backlog.
 - Reports remain query-based and do not use separate report tables.
-- Internal role values and RLS stay unchanged; UI labels use Lead, Developer, Reporter, and Stakeholder.
+- Internal role values and RLS stay unchanged; UI labels use Lead, Developer, Reporter, and Project Manager.
+- Reporter and Project Manager views hide delivery-only fields that are maintained by Lead/Developer users.
 - Public self-registration remains disabled through Supabase Auth settings, not app code.
 
 Migration added:
@@ -145,14 +146,14 @@ Business-friendly roles:
 - Lead: Rick, can manage everything.
 - Developer: Liz, can update assigned tasks, comment, and change status.
 - Reporter: Ellie/Jade, can create tasks and comment.
-- Stakeholder: Sab/Scott, read-only.
+- Project Manager: Sab/Scott, read-only progress visibility.
 
 Internal role mapping for safety:
 
 - `admin` = Lead
 - `developer` = Developer
 - `team` = Reporter
-- `viewer` = Stakeholder
+- `viewer` = Project Manager
 
 Recommendation: keep existing internal role values for now to avoid risky role migrations. Update UI labels and documentation to use the business-friendly names. Revisit a database role-name migration only if there is a strong reason after the workflow stabilizes.
 
@@ -255,7 +256,7 @@ Plan:
    - Authenticated users can read sprints.
    - Lead/admin can create, update, and delete sprints.
    - Developers can read sprints.
-   - Requesters and stakeholders can read sprints.
+   - Requesters and project managers can read sprints through reports and task context.
 6. Update grants for authenticated access.
 
 Safety notes:
@@ -273,7 +274,7 @@ Plan:
 1. Document Supabase Auth settings for disabling public signup.
 2. Keep profile auto-creation for Auth users created by admin.
 3. Keep existing internal role values unless a later migration is approved.
-4. Add helper UI labels mapping internal roles to Lead/Developer/Reporter/Stakeholder.
+4. Add helper UI labels mapping internal roles to Lead/Developer/Reporter/Project Manager.
 
 ## UI Change Plan
 
@@ -843,7 +844,7 @@ Required fields:
 - `details`
 - `decision_needed`
 - `acceptance_criteria`
-- `client_comment`
+- `client_comment` (legacy, hidden from UI and exports)
 - `environment`
 - `related_url`
 - `screenshot_url`

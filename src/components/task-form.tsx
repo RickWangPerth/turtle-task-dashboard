@@ -4,6 +4,7 @@ import {
   TASK_PRIORITIES,
   TASK_STATUSES,
 } from "@/lib/tasks/constants";
+import { canSeeDeliveryFields } from "@/lib/roles";
 import type { Database } from "@/lib/supabase/types";
 
 type Task = Database["public"]["Tables"]["tasks"]["Row"];
@@ -13,6 +14,7 @@ type Sprint = Database["public"]["Tables"]["sprints"]["Row"];
 type TaskFormProps = {
   action: (formData: FormData) => void;
   profiles: Profile[];
+  role?: Profile["role"] | null;
   sprints?: Sprint[];
   task?: Task;
   submitLabel: string;
@@ -43,10 +45,13 @@ const inputClass =
 export function TaskForm({
   action,
   profiles,
+  role,
   sprints = [],
   task,
   submitLabel,
 }: TaskFormProps) {
+  const showDeliveryFields = canSeeDeliveryFields(role);
+
   return (
     <form action={action} className="space-y-8">
       <section className="rounded-lg border border-border bg-white p-6 shadow-sm">
@@ -62,14 +67,18 @@ export function TaskForm({
               />
             </Field>
           </div>
-          <Field label="Epic">
-            <input
-              className={inputClass}
-              name="epic"
-              list="epic-options"
-              defaultValue={task?.epic ?? ""}
-            />
-          </Field>
+          {showDeliveryFields ? (
+            <Field label="Epic">
+              <input
+                className={inputClass}
+                name="epic"
+                list="epic-options"
+                defaultValue={task?.epic ?? ""}
+              />
+            </Field>
+          ) : (
+            <input name="epic" type="hidden" value={task?.epic ?? ""} />
+          )}
           <Field label="Priority">
             <select
               className={inputClass}
@@ -83,32 +92,49 @@ export function TaskForm({
               ))}
             </select>
           </Field>
-          <Field label="Status">
-            <select
-              className={inputClass}
-              name="status"
-              defaultValue={task?.status ?? "Backlog"}
-            >
-              {TASK_STATUSES.map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field label="Environment">
-            <select
-              className={inputClass}
-              name="environment"
-              defaultValue={task?.environment ?? "NA"}
-            >
-              {TASK_ENVIRONMENTS.map((environment) => (
-                <option key={environment} value={environment}>
-                  {environment}
-                </option>
-              ))}
-            </select>
-          </Field>
+          {showDeliveryFields ? (
+            <>
+              <Field label="Status">
+                <select
+                  className={inputClass}
+                  name="status"
+                  defaultValue={task?.status ?? "Backlog"}
+                >
+                  {TASK_STATUSES.map((status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <Field label="Environment">
+                <select
+                  className={inputClass}
+                  name="environment"
+                  defaultValue={task?.environment ?? "NA"}
+                >
+                  {TASK_ENVIRONMENTS.map((environment) => (
+                    <option key={environment} value={environment}>
+                      {environment}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+            </>
+          ) : (
+            <>
+              <input
+                name="status"
+                type="hidden"
+                value={task?.status ?? "Backlog"}
+              />
+              <input
+                name="environment"
+                type="hidden"
+                value={task?.environment ?? "NA"}
+              />
+            </>
+          )}
         </div>
       </section>
 
@@ -122,34 +148,51 @@ export function TaskForm({
               defaultValue={task?.requester ?? ""}
             />
           </Field>
-          <Field label="Assignee">
-            <select
-              className={inputClass}
-              name="assignee_id"
-              defaultValue={task?.assignee_id ?? task?.owner_id ?? ""}
-            >
-              <option value="">Unassigned</option>
-              {profiles.map((profile) => (
-                <option key={profile.id} value={profile.id}>
-                  {profile.display_name ?? profile.email ?? profile.id}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field label="Sprint">
-            <select
-              className={inputClass}
-              name="sprint_id"
-              defaultValue={task?.sprint_id ?? ""}
-            >
-              <option value="">No sprint</option>
-              {sprints.map((sprint) => (
-                <option key={sprint.id} value={sprint.id}>
-                  {sprint.name} ({sprint.status})
-                </option>
-              ))}
-            </select>
-          </Field>
+          {showDeliveryFields ? (
+            <>
+              <Field label="Assignee">
+                <select
+                  className={inputClass}
+                  name="assignee_id"
+                  defaultValue={task?.assignee_id ?? task?.owner_id ?? ""}
+                >
+                  <option value="">Unassigned</option>
+                  {profiles.map((profile) => (
+                    <option key={profile.id} value={profile.id}>
+                      {profile.display_name ?? profile.email ?? profile.id}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <Field label="Sprint">
+                <select
+                  className={inputClass}
+                  name="sprint_id"
+                  defaultValue={task?.sprint_id ?? ""}
+                >
+                  <option value="">No sprint</option>
+                  {sprints.map((sprint) => (
+                    <option key={sprint.id} value={sprint.id}>
+                      {sprint.name} ({sprint.status})
+                    </option>
+                  ))}
+                </select>
+              </Field>
+            </>
+          ) : (
+            <>
+              <input
+                name="assignee_id"
+                type="hidden"
+                value={task?.assignee_id ?? task?.owner_id ?? ""}
+              />
+              <input
+                name="sprint_id"
+                type="hidden"
+                value={task?.sprint_id ?? ""}
+              />
+            </>
+          )}
           <input name="owner_id" type="hidden" value={task?.owner_id ?? ""} />
           <div className="md:col-span-2">
             <Field label="Details">
@@ -161,16 +204,11 @@ export function TaskForm({
               />
             </Field>
           </div>
-          <div className="md:col-span-2">
-            <Field label="Client comment">
-              <textarea
-                className={inputClass}
-                name="client_comment"
-                rows={3}
-                defaultValue={task?.client_comment ?? ""}
-              />
-            </Field>
-          </div>
+          <input
+            name="client_comment"
+            type="hidden"
+            value={task?.client_comment ?? ""}
+          />
           <Field label="Related URL">
             <input
               className={inputClass}
@@ -213,32 +251,49 @@ export function TaskForm({
               />
             </Field>
           </div>
-          <div className="md:col-span-2">
-            <Field label="Implementation plan">
-              <textarea
-                className={inputClass}
+          {showDeliveryFields ? (
+            <>
+              <div className="md:col-span-2">
+                <Field label="Implementation plan">
+                  <textarea
+                    className={inputClass}
+                    name="implementation_plan"
+                    rows={6}
+                    defaultValue={task?.implementation_plan ?? ""}
+                    placeholder={
+                      "1. Confirm requested behaviour\n2. Update validation logic\n3. Update affected screens or exports\n4. UAT with Turtle team\n5. Deploy to PROD"
+                    }
+                  />
+                </Field>
+              </div>
+              <div className="md:col-span-2">
+                <Field label="Completion notes">
+                  <textarea
+                    className={inputClass}
+                    name="completion_notes"
+                    rows={6}
+                    defaultValue={task?.completion_notes ?? ""}
+                    placeholder={
+                      "Implemented:\n- Added requested change\n\nTested:\n- UAT completed with Turtle team\n\nReleased:\n- PROD version 2.0.15"
+                    }
+                  />
+                </Field>
+              </div>
+            </>
+          ) : (
+            <>
+              <input
                 name="implementation_plan"
-                rows={6}
-                defaultValue={task?.implementation_plan ?? ""}
-                placeholder={
-                  "1. Update database schema\n2. Add validation logic\n3. Update export query\n4. UAT with Turtle team\n5. Deploy to PROD"
-                }
+                type="hidden"
+                value={task?.implementation_plan ?? ""}
               />
-            </Field>
-          </div>
-          <div className="md:col-span-2">
-            <Field label="Completion notes">
-              <textarea
-                className={inputClass}
+              <input
                 name="completion_notes"
-                rows={6}
-                defaultValue={task?.completion_notes ?? ""}
-                placeholder={
-                  "Implemented:\n- Added new tag state\n\nTested:\n- UAT completed with Turtle team\n\nReleased:\n- PROD version 2.0.15"
-                }
+                type="hidden"
+                value={task?.completion_notes ?? ""}
               />
-            </Field>
-          </div>
+            </>
+          )}
           <Field label="Start date">
             <input
               className={inputClass}
@@ -255,37 +310,60 @@ export function TaskForm({
               defaultValue={dateValue(task?.due_date)}
             />
           </Field>
-          <Field label="UAT date">
-            <input
-              className={inputClass}
-              name="uat_date"
-              type="date"
-              defaultValue={dateValue(task?.uat_date)}
-            />
-          </Field>
-          <Field label="PROD date">
-            <input
-              className={inputClass}
-              name="prod_date"
-              type="date"
-              defaultValue={dateValue(task?.prod_date)}
-            />
-          </Field>
-          <Field label="Version">
-            <input
-              className={inputClass}
-              name="version"
-              defaultValue={task?.version ?? ""}
-            />
-          </Field>
-          <Field label="Commit URL">
-            <input
-              className={inputClass}
-              name="commit_url"
-              type="url"
-              defaultValue={task?.commit_url ?? ""}
-            />
-          </Field>
+          {showDeliveryFields ? (
+            <>
+              <Field label="UAT date">
+                <input
+                  className={inputClass}
+                  name="uat_date"
+                  type="date"
+                  defaultValue={dateValue(task?.uat_date)}
+                />
+              </Field>
+              <Field label="PROD date">
+                <input
+                  className={inputClass}
+                  name="prod_date"
+                  type="date"
+                  defaultValue={dateValue(task?.prod_date)}
+                />
+              </Field>
+              <Field label="Version">
+                <input
+                  className={inputClass}
+                  name="version"
+                  defaultValue={task?.version ?? ""}
+                />
+              </Field>
+              <Field label="Commit URL">
+                <input
+                  className={inputClass}
+                  name="commit_url"
+                  type="url"
+                  defaultValue={task?.commit_url ?? ""}
+                />
+              </Field>
+            </>
+          ) : (
+            <>
+              <input
+                name="uat_date"
+                type="hidden"
+                value={dateValue(task?.uat_date)}
+              />
+              <input
+                name="prod_date"
+                type="hidden"
+                value={dateValue(task?.prod_date)}
+              />
+              <input name="version" type="hidden" value={task?.version ?? ""} />
+              <input
+                name="commit_url"
+                type="hidden"
+                value={task?.commit_url ?? ""}
+              />
+            </>
+          )}
         </div>
       </section>
 

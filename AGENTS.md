@@ -182,7 +182,7 @@ Fields:
 * Details
 * Decision needed
 * Acceptance criteria
-* Client comment
+* Client comment (legacy database field; do not show in the UI)
 * Environment
 * Related URL
 * Screenshot URL

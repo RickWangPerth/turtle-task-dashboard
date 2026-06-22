@@ -17,10 +17,14 @@ type EditTaskPageProps = {
 
 export default async function EditTaskPage({ params }: EditTaskPageProps) {
   const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   const [
     { data: task, error: taskError },
     { data: profiles, error: profilesError },
     { data: sprints, error: sprintsError },
+    { data: currentProfile },
   ] = await Promise.all([
       supabase.from("tasks").select("*").eq("id", params.id).single(),
       supabase
@@ -31,6 +35,9 @@ export default async function EditTaskPage({ params }: EditTaskPageProps) {
         .from("sprints")
         .select("*")
         .order("start_date", { ascending: false }),
+      user
+        ? supabase.from("profiles").select("role").eq("id", user.id).maybeSingle()
+        : Promise.resolve({ data: null }),
     ]);
 
   if (taskError || !task) {
@@ -44,6 +51,8 @@ export default async function EditTaskPage({ params }: EditTaskPageProps) {
   const currentTask = task as Task;
   const allProfiles = (profiles ?? []) as Profile[];
   const allSprints = (sprints ?? []) as Sprint[];
+  const currentRole =
+    (currentProfile as Pick<Profile, "role"> | null)?.role ?? null;
 
   return (
     <div className="space-y-6">
@@ -54,6 +63,7 @@ export default async function EditTaskPage({ params }: EditTaskPageProps) {
       <TaskForm
         action={updateTask.bind(null, currentTask.id)}
         profiles={allProfiles}
+        role={currentRole}
         sprints={allSprints}
         submitLabel="Save task"
         task={currentTask}

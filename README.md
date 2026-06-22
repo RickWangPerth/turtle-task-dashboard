@@ -21,7 +21,9 @@ npm run dev
 - Role management UI is intentionally deferred.
 - Create users manually in Supabase Auth; public self-registration should remain disabled in Supabase settings.
 - Assign the first Lead manually in Supabase by updating `public.profiles.role` to `admin`.
-- Internal roles remain `admin`, `developer`, `team`, and `viewer`; the UI labels them Lead, Developer, Reporter, and Stakeholder.
+- Internal roles remain `admin`, `developer`, `team`, and `viewer`; the UI labels them Lead, Developer, Reporter, and Project Manager.
+- Reporter and Project Manager views hide delivery-only fields such as epic, assignee, sprint, review status, environment, implementation plan, completion notes, UAT date, PROD date, version, and commit URL.
+- `client_comment` is a legacy database field and is no longer shown in the UI or exports.
 - Status history is recorded by a database trigger on `tasks.status` changes.
 - File uploads are not part of MVP; use `related_url` and `screenshot_url`.
 - Board work uses an `Active` sprint when one exists. If there is no Active sprint, the Board falls back to all non-Done tasks, including Backlog.

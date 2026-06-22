@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/page-header";
 import { SaveNotice } from "@/components/save-notice";
 import { PriorityBadge, StatusBadge } from "@/components/badges";
+import { canSeeDeliveryFields } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
 import { TASK_STATUSES } from "@/lib/tasks/constants";
 import { formatDate, formatDateTime } from "@/lib/tasks/format";
@@ -203,6 +204,9 @@ export default async function TaskDetailPage({
   searchParams,
 }: TaskDetailPageProps) {
   const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   const { data: task, error } = await supabase
     .from("tasks")
     .select("*")
@@ -223,6 +227,7 @@ export default async function TaskDetailPage({
     { data: comments },
     { data: histories },
     { data: profiles },
+    { data: currentProfile },
   ] = await Promise.all([
     currentTask.owner_id
       ? supabase
@@ -263,11 +268,17 @@ export default async function TaskDetailPage({
       .eq("task_id", currentTask.id)
       .order("changed_at", { ascending: false }),
     supabase.from("profiles").select("*"),
+    user
+      ? supabase.from("profiles").select("role").eq("id", user.id).maybeSingle()
+      : Promise.resolve({ data: null }),
   ]);
 
   const profileMap = new Map(
     ((profiles ?? []) as Profile[]).map((profile) => [profile.id, profile]),
   );
+  const role = (currentProfile as Pick<Profile, "role"> | null)?.role ?? null;
+  const showDeliveryFields = canSeeDeliveryFields(role);
+  const canUpdateStatus = role === "admin" || role === "developer" || role === "team";
 
   return (
     <div className="space-y-6">
@@ -297,22 +308,30 @@ export default async function TaskDetailPage({
         <div className="flex flex-wrap gap-2">
           <PriorityBadge priority={currentTask.priority} />
           <StatusBadge status={currentTask.status} />
-          <span className="inline-flex items-center rounded-md border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-medium text-slate-700">
-            {currentTask.environment}
-          </span>
+          {showDeliveryFields ? (
+            <span className="inline-flex items-center rounded-md border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-medium text-slate-700">
+              {currentTask.environment}
+            </span>
+          ) : null}
         </div>
         <dl className="mt-6 grid gap-5 md:grid-cols-3">
-          <DetailItem label="Epic" value={currentTask.epic} />
+          {showDeliveryFields ? (
+            <DetailItem label="Epic" value={currentTask.epic} />
+          ) : null}
           <DetailItem label="Requester" value={currentTask.requester} />
-          <DetailItem
-            label="Assignee"
-            value={profileName((assignee as Profile | null) ?? owner)}
-          />
-          <DetailItem
-            label="Sprint"
-            value={(sprint as Sprint | null)?.name ?? "-"}
-          />
-          <DetailItem label="Owner" value={profileName(owner)} />
+          {showDeliveryFields ? (
+            <>
+              <DetailItem
+                label="Assignee"
+                value={profileName((assignee as Profile | null) ?? owner)}
+              />
+              <DetailItem
+                label="Sprint"
+                value={(sprint as Sprint | null)?.name ?? "-"}
+              />
+              <DetailItem label="Owner" value={profileName(owner)} />
+            </>
+          ) : null}
           <DetailItem label="Created by" value={profileName(creator)} />
           <DetailItem
             label="Created"
@@ -327,24 +346,34 @@ export default async function TaskDetailPage({
             value={formatDate(currentTask.start_date)}
           />
           <DetailItem label="Due date" value={formatDate(currentTask.due_date)} />
-          <DetailItem label="UAT date" value={formatDate(currentTask.uat_date)} />
-          <DetailItem label="PROD date" value={formatDate(currentTask.prod_date)} />
-          <DetailItem label="Version" value={currentTask.version} />
-          <DetailItem
-            label="Commit URL"
-            value={
-              currentTask.commit_url ? (
-                <a
-                  className="text-blue-700 underline"
-                  href={currentTask.commit_url}
-                >
-                  {currentTask.commit_url}
-                </a>
-              ) : (
-                "-"
-              )
-            }
-          />
+          {showDeliveryFields ? (
+            <>
+              <DetailItem
+                label="UAT date"
+                value={formatDate(currentTask.uat_date)}
+              />
+              <DetailItem
+                label="PROD date"
+                value={formatDate(currentTask.prod_date)}
+              />
+              <DetailItem label="Version" value={currentTask.version} />
+              <DetailItem
+                label="Commit URL"
+                value={
+                  currentTask.commit_url ? (
+                    <a
+                      className="text-blue-700 underline"
+                      href={currentTask.commit_url}
+                    >
+                      {currentTask.commit_url}
+                    </a>
+                  ) : (
+                    "-"
+                  )
+                }
+              />
+            </>
+          ) : null}
           <DetailItem
             label="Related URL"
             value={
@@ -378,7 +407,9 @@ export default async function TaskDetailPage({
         </dl>
       </section>
 
-      <StatusQuickUpdate status={currentTask.status} taskId={currentTask.id} />
+      {canUpdateStatus ? (
+        <StatusQuickUpdate status={currentTask.status} taskId={currentTask.id} />
+      ) : null}
 
       <TextBlock label="Details" value={currentTask.details} />
       <TextBlock label="Decision needed" value={currentTask.decision_needed} />
@@ -386,15 +417,18 @@ export default async function TaskDetailPage({
         label="Acceptance criteria"
         value={currentTask.acceptance_criteria}
       />
-      <TextBlock
-        label="Implementation Plan"
-        value={currentTask.implementation_plan}
-      />
-      <TextBlock
-        label="Completion Notes"
-        value={currentTask.completion_notes}
-      />
-      <TextBlock label="Client comment" value={currentTask.client_comment} />
+      {showDeliveryFields ? (
+        <>
+          <TextBlock
+            label="Implementation Plan"
+            value={currentTask.implementation_plan}
+          />
+          <TextBlock
+            label="Completion Notes"
+            value={currentTask.completion_notes}
+          />
+        </>
+      ) : null}
 
       <ActivitySection
         comments={(comments ?? []) as TaskComment[]}

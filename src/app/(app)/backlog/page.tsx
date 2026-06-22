@@ -8,6 +8,7 @@ import {
   ReviewStatusBadge,
   StatusBadge,
 } from "@/components/badges";
+import { canSeeDeliveryFields } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
 import {
   TASK_ENVIRONMENTS,
@@ -89,6 +90,7 @@ export default async function BacklogPage({ searchParams }: BacklogPageProps) {
   const profileById = new Map(profileRows.map((item) => [item.id, item]));
   const sprintById = new Map(sprintRows.map((item) => [item.id, item]));
   const currentUserProfile = currentProfile as Pick<Profile, "role"> | null;
+  const showDeliveryFields = canSeeDeliveryFields(currentUserProfile?.role);
   const canUpdateReview =
     currentUserProfile?.role === "admin" ||
     currentUserProfile?.role === "developer";
@@ -177,91 +179,95 @@ export default async function BacklogPage({ searchParams }: BacklogPageProps) {
               ))}
             </select>
           </label>
-          <label className="block">
-            <span className="text-xs font-medium uppercase tracking-wide text-muted">
-              Review
-            </span>
-            <select
-              className="mt-2 w-full rounded-md border border-border px-3 py-2 text-sm"
-              name="review_status"
-              defaultValue={params.review_status ?? ""}
-            >
-              <option value="">All</option>
-              {TASK_REVIEW_STATUSES.map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block">
-            <span className="text-xs font-medium uppercase tracking-wide text-muted">
-              Epic
-            </span>
-            <select
-              className="mt-2 w-full rounded-md border border-border px-3 py-2 text-sm"
-              name="epic"
-              defaultValue={params.epic ?? ""}
-            >
-              <option value="">All</option>
-              {epics.map((epic) => (
-                <option key={epic} value={epic}>
-                  {epic}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block">
-            <span className="text-xs font-medium uppercase tracking-wide text-muted">
-              Assignee
-            </span>
-            <select
-              className="mt-2 w-full rounded-md border border-border px-3 py-2 text-sm"
-              name="assignee"
-              defaultValue={params.assignee ?? ""}
-            >
-              <option value="">All</option>
-              {profileRows.map((profile) => (
-                <option key={profile.id} value={profile.id}>
-                  {profileName(profile)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block">
-            <span className="text-xs font-medium uppercase tracking-wide text-muted">
-              Sprint
-            </span>
-            <select
-              className="mt-2 w-full rounded-md border border-border px-3 py-2 text-sm"
-              name="sprint"
-              defaultValue={params.sprint ?? ""}
-            >
-              <option value="">All</option>
-              {sprintRows.map((sprint) => (
-                <option key={sprint.id} value={sprint.id}>
-                  {sprint.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block">
-            <span className="text-xs font-medium uppercase tracking-wide text-muted">
-              Environment
-            </span>
-            <select
-              className="mt-2 w-full rounded-md border border-border px-3 py-2 text-sm"
-              name="environment"
-              defaultValue={params.environment ?? ""}
-            >
-              <option value="">All</option>
-              {TASK_ENVIRONMENTS.map((environment) => (
-                <option key={environment} value={environment}>
-                  {environment}
-                </option>
-              ))}
-            </select>
-          </label>
+          {showDeliveryFields ? (
+            <>
+              <label className="block">
+                <span className="text-xs font-medium uppercase tracking-wide text-muted">
+                  Review
+                </span>
+                <select
+                  className="mt-2 w-full rounded-md border border-border px-3 py-2 text-sm"
+                  name="review_status"
+                  defaultValue={params.review_status ?? ""}
+                >
+                  <option value="">All</option>
+                  {TASK_REVIEW_STATUSES.map((status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block">
+                <span className="text-xs font-medium uppercase tracking-wide text-muted">
+                  Epic
+                </span>
+                <select
+                  className="mt-2 w-full rounded-md border border-border px-3 py-2 text-sm"
+                  name="epic"
+                  defaultValue={params.epic ?? ""}
+                >
+                  <option value="">All</option>
+                  {epics.map((epic) => (
+                    <option key={epic} value={epic}>
+                      {epic}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block">
+                <span className="text-xs font-medium uppercase tracking-wide text-muted">
+                  Assignee
+                </span>
+                <select
+                  className="mt-2 w-full rounded-md border border-border px-3 py-2 text-sm"
+                  name="assignee"
+                  defaultValue={params.assignee ?? ""}
+                >
+                  <option value="">All</option>
+                  {profileRows.map((profile) => (
+                    <option key={profile.id} value={profile.id}>
+                      {profileName(profile)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block">
+                <span className="text-xs font-medium uppercase tracking-wide text-muted">
+                  Sprint
+                </span>
+                <select
+                  className="mt-2 w-full rounded-md border border-border px-3 py-2 text-sm"
+                  name="sprint"
+                  defaultValue={params.sprint ?? ""}
+                >
+                  <option value="">All</option>
+                  {sprintRows.map((sprint) => (
+                    <option key={sprint.id} value={sprint.id}>
+                      {sprint.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block">
+                <span className="text-xs font-medium uppercase tracking-wide text-muted">
+                  Environment
+                </span>
+                <select
+                  className="mt-2 w-full rounded-md border border-border px-3 py-2 text-sm"
+                  name="environment"
+                  defaultValue={params.environment ?? ""}
+                >
+                  <option value="">All</option>
+                  {TASK_ENVIRONMENTS.map((environment) => (
+                    <option key={environment} value={environment}>
+                      {environment}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </>
+          ) : null}
         </div>
         <div className="mt-4 flex gap-2">
           <button
@@ -288,13 +294,21 @@ export default async function BacklogPage({ searchParams }: BacklogPageProps) {
                   <th className="px-4 py-3">Code</th>
                   <th className="px-4 py-3">Priority</th>
                   <th className="px-4 py-3">Title</th>
-                  <th className="px-4 py-3">Epic</th>
+                  {showDeliveryFields ? (
+                    <th className="px-4 py-3">Epic</th>
+                  ) : null}
                   <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Review</th>
+                  {showDeliveryFields ? (
+                    <th className="px-4 py-3">Review</th>
+                  ) : null}
                   <th className="px-4 py-3">Requester</th>
-                  <th className="px-4 py-3">Assignee</th>
-                  <th className="px-4 py-3">Sprint</th>
-                  <th className="px-4 py-3">Environment</th>
+                  {showDeliveryFields ? (
+                    <>
+                      <th className="px-4 py-3">Assignee</th>
+                      <th className="px-4 py-3">Sprint</th>
+                      <th className="px-4 py-3">Environment</th>
+                    </>
+                  ) : null}
                   <th className="px-4 py-3">Due</th>
                   <th className="px-4 py-3">Updated</th>
                 </tr>
@@ -334,60 +348,68 @@ export default async function BacklogPage({ searchParams }: BacklogPageProps) {
                           {task.title}
                         </Link>
                       </td>
-                      <td className="px-4 py-3 text-muted">
-                        {task.epic ?? "-"}
-                      </td>
+                      {showDeliveryFields ? (
+                        <td className="px-4 py-3 text-muted">
+                          {task.epic ?? "-"}
+                        </td>
+                      ) : null}
                       <td className="px-4 py-3">
                         <StatusBadge status={task.status} />
                       </td>
-                      <td className="min-w-48 px-4 py-3">
-                        {canUpdateReview ? (
-                          <form
-                            action={updateTaskReviewStatus.bind(null, task.id)}
-                            className="flex items-center gap-2"
-                          >
-                            <select
-                              className="rounded-md border border-border bg-white px-2 py-1.5 text-xs text-ink"
-                              defaultValue={task.review_status}
-                              name="review_status"
+                      {showDeliveryFields ? (
+                        <td className="min-w-48 px-4 py-3">
+                          {canUpdateReview ? (
+                            <form
+                              action={updateTaskReviewStatus.bind(null, task.id)}
+                              className="flex items-center gap-2"
                             >
-                              {TASK_REVIEW_STATUSES.map((status) => (
-                                <option key={status} value={status}>
-                                  {status}
-                                </option>
-                              ))}
-                            </select>
-                            <button
-                              className="rounded-md bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-slate-700"
-                              type="submit"
-                            >
-                              Save
-                            </button>
-                          </form>
-                        ) : (
-                          <ReviewStatusBadge status={task.review_status} />
-                        )}
-                      </td>
+                              <select
+                                className="rounded-md border border-border bg-white px-2 py-1.5 text-xs text-ink"
+                                defaultValue={task.review_status}
+                                name="review_status"
+                              >
+                                {TASK_REVIEW_STATUSES.map((status) => (
+                                  <option key={status} value={status}>
+                                    {status}
+                                  </option>
+                                ))}
+                              </select>
+                              <button
+                                className="rounded-md bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-slate-700"
+                                type="submit"
+                              >
+                                Save
+                              </button>
+                            </form>
+                          ) : (
+                            <ReviewStatusBadge status={task.review_status} />
+                          )}
+                        </td>
+                      ) : null}
                       <td className="px-4 py-3 text-muted">
                         {task.requester ?? "-"}
                       </td>
-                      <td className="px-4 py-3 text-muted">
-                        {profileName(
-                          task.assignee_id
-                            ? profileById.get(task.assignee_id)
-                            : task.owner_id
-                              ? profileById.get(task.owner_id)
-                              : undefined,
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-muted">
-                        {task.sprint_id
-                          ? sprintById.get(task.sprint_id)?.name ?? "-"
-                          : "-"}
-                      </td>
-                      <td className="px-4 py-3 text-muted">
-                        {task.environment}
-                      </td>
+                      {showDeliveryFields ? (
+                        <>
+                          <td className="px-4 py-3 text-muted">
+                            {profileName(
+                              task.assignee_id
+                                ? profileById.get(task.assignee_id)
+                                : task.owner_id
+                                  ? profileById.get(task.owner_id)
+                                  : undefined,
+                            )}
+                          </td>
+                          <td className="px-4 py-3 text-muted">
+                            {task.sprint_id
+                              ? sprintById.get(task.sprint_id)?.name ?? "-"
+                              : "-"}
+                          </td>
+                          <td className="px-4 py-3 text-muted">
+                            {task.environment}
+                          </td>
+                        </>
+                      ) : null}
                       <td className="whitespace-nowrap px-4 py-3 text-muted">
                         {formatDate(task.due_date)}
                       </td>

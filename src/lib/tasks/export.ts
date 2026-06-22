@@ -14,7 +14,6 @@ const EXPORT_FIELDS: Array<keyof Task> = [
   "details",
   "decision_needed",
   "acceptance_criteria",
-  "client_comment",
   "environment",
   "related_url",
   "screenshot_url",

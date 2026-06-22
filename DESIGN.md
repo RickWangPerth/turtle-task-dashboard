@@ -275,7 +275,7 @@ Sections:
 
 * Requester
 * Details
-* Client comment
+* Client comment (legacy database field; hidden from the UI)
 * Related URL
 * Screenshot URL
 
