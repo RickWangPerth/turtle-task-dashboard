@@ -33,3 +33,17 @@ npm run dev
 - Imported wishlist tasks use `tasks.review_status` so Rick/Liz can triage them in Backlog.
 - One-time import SQL lives at `supabase/imports/initial_wishlist_tasks.sql`; it inserts directly into `public.tasks` and does not use import batch tables.
 - Delivery planning stays lightweight: `tasks.implementation_plan` records Rick's proposed approach, and `tasks.completion_notes` records what was implemented, tested, and released.
+- Task-created email notifications use Resend when `RESEND_API_KEY`, `TASK_NOTIFICATION_TO`, and `TASK_NOTIFICATION_FROM` are configured. Missing email env vars disable notifications, and email failures do not block task creation.
+
+## Task Notification Email
+
+Configure these server-only variables in `.env.local` and Vercel:
+
+```bash
+RESEND_API_KEY=re_xxxxxxxxx
+TASK_NOTIFICATION_TO=lead@example.com
+TASK_NOTIFICATION_FROM="Turtle Delivery Board <notifications@example.com>"
+APP_BASE_URL=http://localhost:3001
+```
+
+Use a verified Resend sending domain for `TASK_NOTIFICATION_FROM` before production use.

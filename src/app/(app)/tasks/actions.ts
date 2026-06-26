@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { sendTaskCreatedEmail } from "@/lib/email/task-notifications";
 import { createClient } from "@/lib/supabase/server";
 import {
   TASK_ENVIRONMENTS,
@@ -107,11 +108,25 @@ export async function createTask(formData: FormData) {
 
   const { data, error } = await taskTable
     .insert(payload as TaskInsert)
-    .select("id")
+    .select("id, task_code, title, priority, requester, details")
     .single();
 
   if (error) {
     throw new Error(error.message);
+  }
+
+  try {
+    await sendTaskCreatedEmail({
+      appBaseUrl: headers().get("origin"),
+      details: data.details,
+      id: data.id,
+      priority: data.priority,
+      requester: data.requester,
+      taskCode: data.task_code,
+      title: data.title,
+    });
+  } catch (notificationError) {
+    console.error("Task notification email failed", notificationError);
   }
 
   revalidatePath("/backlog");

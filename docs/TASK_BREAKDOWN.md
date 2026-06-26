@@ -614,6 +614,19 @@ Tasks:
 - [x] Keep existing task edit permissions.
 - [x] Do not add subtasks, dependencies, checklist tables, workflow engines, story points, or velocity tracking.
 
+### Issue 53: Add task-created email notification
+
+Status: Done
+
+Tasks:
+
+- [x] Add Resend SDK dependency.
+- [x] Add server-only task notification helper.
+- [x] Send a Lead notification after successful task creation.
+- [x] Keep missing email env vars as a no-op.
+- [x] Log email failures without blocking task creation.
+- [x] Document required Resend environment variables.
+
 ## Architecture Decisions
 
 ### ADR-001: Database trigger owns status history
@@ -683,3 +696,7 @@ Implementation planning and completion tracking are stored directly on `tasks` a
 ### ADR-017: Hide delivery-only fields from non-delivery roles
 
 Reporter and Project Manager users should see the request and progress information they need, while Lead and Developer users maintain delivery fields such as epic, assignee, sprint, review status, environment, implementation plan, completion notes, UAT date, PROD date, version, and commit URL. The database fields remain unchanged so existing tasks and exports are not broken.
+
+### ADR-018: Task-created email uses direct Resend send
+
+Task-created email notification is intentionally direct and minimal. After a task is inserted successfully, the server action sends one email through Resend if the required server-only environment variables are configured. Missing configuration disables sending, and send failures are logged without blocking task creation. No notification table, retry queue, delivery preferences, or notification UI is added.
