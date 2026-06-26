@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AppNav } from "@/components/app-nav";
 import { SignOutButton } from "@/components/sign-out-button";
 import { friendlyRoleLabel } from "@/lib/roles";
 
@@ -22,7 +23,7 @@ export function AppShell({ children, email, role }: AppShellProps) {
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="border-b border-border bg-white">
-        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8">
           <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
             <Link href="/backlog" className="text-lg font-semibold text-ink">
               Turtle Team Delivery Board
@@ -37,17 +38,7 @@ export function AppShell({ children, email, role }: AppShellProps) {
               <SignOutButton />
             </div>
           </div>
-          <nav className="flex flex-wrap gap-2 text-sm">
-            {visibleNavItems.map((item) => (
-              <Link
-                className="rounded-md px-3 py-2 text-muted hover:bg-slate-100 hover:text-ink"
-                href={item.href}
-                key={item.href}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
+          <AppNav items={visibleNavItems} />
         </div>
       </header>
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">

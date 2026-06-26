@@ -20,6 +20,7 @@ export type TaskFilterParams = {
   review_status?: string;
   sprint?: string;
   status?: string;
+  updated?: string;
 };
 
 export function paramsFromSearchParams(
@@ -35,6 +36,7 @@ export function paramsFromSearchParams(
     review_status: searchParams.get("review_status") ?? undefined,
     sprint: searchParams.get("sprint") ?? undefined,
     status: searchParams.get("status") ?? undefined,
+    updated: searchParams.get("updated") ?? undefined,
   };
 }
 

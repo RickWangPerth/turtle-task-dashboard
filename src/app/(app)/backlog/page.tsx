@@ -37,6 +37,7 @@ type BacklogPageProps = {
     saved?: string;
     sprint?: string;
     status?: string;
+    updated?: string;
   };
 };
 
@@ -44,9 +45,27 @@ function profileName(profile: Profile | undefined) {
   return profile?.display_name ?? profile?.email ?? "-";
 }
 
+function buildBacklogHref(
+  params: BacklogPageProps["searchParams"],
+  overrides: Record<string, string | undefined>,
+) {
+  const searchParams = new URLSearchParams();
+
+  for (const [key, value] of Object.entries({ ...params, ...overrides })) {
+    if (value && key !== "saved") {
+      searchParams.set(key, value);
+    }
+  }
+
+  const query = searchParams.toString();
+  return query ? `/backlog?${query}` : "/backlog";
+}
+
 export default async function BacklogPage({ searchParams }: BacklogPageProps) {
   const supabase = createClient();
   const params = searchParams ?? {};
+  const updatedSort = params.updated === "asc" ? "asc" : "desc";
+  const nextUpdatedSort = updatedSort === "asc" ? "desc" : "asc";
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -58,7 +77,7 @@ export default async function BacklogPage({ searchParams }: BacklogPageProps) {
   let query = supabase
     .from("tasks")
     .select("*")
-    .order("updated_at", { ascending: false });
+    .order("updated_at", { ascending: updatedSort === "asc" });
 
   query = applyTaskFilters(query, params);
 
@@ -133,6 +152,7 @@ export default async function BacklogPage({ searchParams }: BacklogPageProps) {
       <SaveNotice saved={params.saved} />
 
       <form className="rounded-lg border border-border bg-white p-4 shadow-sm">
+        <input name="updated" type="hidden" value={updatedSort} />
         <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-8">
           <label className="block">
             <span className="text-xs font-medium uppercase tracking-wide text-muted">
@@ -310,7 +330,20 @@ export default async function BacklogPage({ searchParams }: BacklogPageProps) {
                     </>
                   ) : null}
                   <th className="px-4 py-3">Due</th>
-                  <th className="px-4 py-3">Updated</th>
+                  <th className="px-4 py-3">
+                    <Link
+                      className="inline-flex items-center gap-1 rounded-md px-2 py-1 -ml-2 text-muted hover:bg-slate-100 hover:text-ink"
+                      href={buildBacklogHref(params, {
+                        updated: nextUpdatedSort,
+                      })}
+                      title="Sort by updated time"
+                    >
+                      Updated
+                      <span aria-hidden="true">
+                        {updatedSort === "asc" ? "↑" : "↓"}
+                      </span>
+                    </Link>
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
